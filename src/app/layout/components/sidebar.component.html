@@ -1,0 +1,29 @@
+<aside class="flex flex-col h-screen w-64 shadow-lg" style="background-color: #1a1a1a">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-700">
+    <div class="w-8 h-8 rounded-full flex items-center justify-center"
+         style="background-color: #e75d23">
+      <span class="text-white font-bold text-sm">B</span>
+    </div>
+    <div>
+      <h1 class="text-white font-bold text-lg leading-none">Benedere</h1>
+      <p class="text-gray-400 text-xs">Alimentação Saudável</p>
+    </div>
+  </div>
+
+  <!-- Menu -->
+  <nav class="flex-1 px-3 py-4 overflow-y-auto">
+    @for (item of menuItems; track item.route) {
+      <div
+        [routerLink]="item.route"
+        routerLinkActive="active-link"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200 cursor-pointer"
+      >
+        <i [class]="item.icon + ' text-lg'"></i>
+        <span class="text-sm font-medium">{{ item.label }}</span>
+      </div>
+    }
+  </nav>
+
+</aside>
