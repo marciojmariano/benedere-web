@@ -7,6 +7,7 @@ export const environment = {
     authorizationParams: {
       redirect_uri: window.location.origin,
       audience: 'https://api.benedere.com.br',
+      scope: 'openid profile email',
     },
     logoutUrl: window.location.origin,
   },

@@ -28,24 +28,23 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
-    provideAuth0({
-      domain: environment.auth0.domain,
-      clientId: environment.auth0.clientId,
-      authorizationParams: environment.auth0.authorizationParams,
-      useRefreshTokens: true,
-      cacheLocation: 'localstorage',
-      httpInterceptor: {
-        allowedList: [
-          {
-            uri: `${environment.apiUrl}/*`,
-            tokenOptions: {
-              authorizationParams: {
-                audience: 'https://api.benedere.com.br',
-              },
-            },
+provideAuth0({
+  domain: environment.auth0.domain,
+  clientId: environment.auth0.clientId,
+  authorizationParams: environment.auth0.authorizationParams,
+  useRefreshTokens: false,
+  httpInterceptor: {
+    allowedList: [
+      {
+        uri: `${environment.apiUrl}/*`,
+        tokenOptions: {
+          authorizationParams: {
+            audience: 'https://api.benedere.com.br',
           },
-        ],
+        },
       },
-    }),
-  ],
+    ],
+  },
+}),
+],
 };

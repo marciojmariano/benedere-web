@@ -7,7 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
-
+import { HttpClient } from '@angular/common/http';
 import { ClienteService } from '../../core/services/cliente.service';
 import { Cliente } from '../../core/models';
 
@@ -30,6 +30,7 @@ export class ClientesListComponent implements OnInit {
   private router = inject(Router);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
+  private httpRaw = inject(HttpClient);
 
   clientes: Cliente[] = [];
   loading = false;
@@ -40,12 +41,15 @@ export class ClientesListComponent implements OnInit {
 
   carregar(): void {
     this.loading = true;
+    console.log('Fui chamado! Tentando buscar clientes no serviço...'); // <-- LOG
     this.clienteService.listar().subscribe({
       next: (data) => {
+        console.log('Dados recebidos com sucesso:', data); // <-- LOG
         this.clientes = data;
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Ocorreu um erro na requisição:', err); // <-- LOG
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao carregar clientes' });
         this.loading = false;
       },
