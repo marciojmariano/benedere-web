@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-topbar',
@@ -50,6 +51,6 @@ export class TopbarComponent {
   }
 
   logout(): void {
-    this.auth.logout({ logoutParams: { returnTo: window.location.origin } });
+    this.auth.logout({ logoutParams: { returnTo: environment.auth0.logoutUrl } });
   }
 }

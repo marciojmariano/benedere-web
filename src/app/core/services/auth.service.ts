@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService as Auth0Service } from '@auth0/auth0-angular';
 import { Observable, map } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,7 @@ export class AuthService {
   logout(): void {
     this.auth0.logout({
       logoutParams: {
-        returnTo: window.location.origin,
+        returnTo: environment.auth0.logoutUrl,
       },
     });
   }

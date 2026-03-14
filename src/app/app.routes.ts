@@ -18,6 +18,21 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
       },
+      {
+        path: 'clientes',
+        loadComponent: () =>
+          import('./features/clientes/clientes-list.component').then((m) => m.ClientesListComponent),
+      },
+      {
+        path: 'clientes/novo',
+        loadComponent: () =>
+          import('./features/clientes/cliente-form.component').then((m) => m.ClienteFormComponent),
+      },
+      {
+        path: 'clientes/:id',
+        loadComponent: () =>
+          import('./features/clientes/cliente-form.component').then((m) => m.ClienteFormComponent),
+      },
     ],
   },
   {
