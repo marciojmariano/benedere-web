@@ -33,6 +33,21 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/clientes/cliente-form.component').then((m) => m.ClienteFormComponent),
       },
+      {
+        path: 'nutricionistas',
+        loadComponent: () =>
+           import('./features/nutricionistas/nutricionistas-list.component').then((m) => m.NutricionistasListComponent),
+      },
+      {
+        path: 'nutricionistas/novo',
+        loadComponent: () =>
+            import('./features/nutricionistas/nutricionista-form.component').then((m) => m.NutricionistaFormComponent),
+      },
+      {
+        path: 'nutricionistas/:id',
+        loadComponent: () =>
+            import('./features/nutricionistas/nutricionista-form.component').then((m) => m.NutricionistaFormComponent),
+      },
     ],
   },
   {

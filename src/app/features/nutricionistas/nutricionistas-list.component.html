@@ -1,0 +1,45 @@
+<div>
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">Nutricionistas</h2>
+      <p class="text-gray-500 text-sm mt-1">Gerencie os nutricionistas cadastrados</p>
+    </div>
+    <p-button label="Novo Nutricionista" icon="pi pi-plus" (onClick)="novo()" />
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <p-table [value]="nutricionistas" [loading]="loading" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nome</th>
+          <th>CRN</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Status</th>
+          <th style="width: 120px">Ações</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-n>
+        <tr>
+          <td class="font-medium">{{ n.nome }}</td>
+          <td>{{ n.crn }}</td>
+          <td>{{ n.email || '—' }}</td>
+          <td>{{ n.telefone || '—' }}</td>
+          <td><p-tag [value]="n.ativo ? 'Ativo' : 'Inativo'" [severity]="n.ativo ? 'success' : 'danger'" /></td>
+          <td>
+            <div class="flex gap-2">
+              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="editar(n)" />
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="confirmarDesativar(n)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="6" class="text-center text-gray-400 py-8">Nenhum nutricionista encontrado</td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
