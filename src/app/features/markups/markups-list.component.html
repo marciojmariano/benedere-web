@@ -1,0 +1,43 @@
+<div>
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">Markups</h2>
+      <p class="text-gray-500 text-sm mt-1">Gerencie os markups cadastrados</p>
+    </div>
+    <p-button label="Novo Markup" icon="pi pi-plus" (onClick)="novo()" />
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <p-table [value]="markups" [loading]="loading" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nome</th>
+          <th>Fator</th>
+          <th>Índices</th>
+          <th>Status</th>
+          <th style="width: 120px">Ações</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-m>
+        <tr>
+          <td class="font-medium">{{ m.nome }}</td>
+          <td>{{ m.fator }}</td>
+          <td>{{ m.indices?.length || 0 }} índice(s)</td>
+          <td><p-tag [value]="m.ativo ? 'Ativo' : 'Inativo'" [severity]="m.ativo ? 'success' : 'danger'" /></td>
+          <td>
+            <div class="flex gap-2">
+              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="editar(m)" />
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="confirmarDesativar(m)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="5" class="text-center text-gray-400 py-8">Nenhum markup encontrado</td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

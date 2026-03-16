@@ -48,6 +48,26 @@ export const routes: Routes = [
         loadComponent: () =>
             import('./features/nutricionistas/nutricionista-form.component').then((m) => m.NutricionistaFormComponent),
       },
+      {
+        path: 'ingredientes',
+        loadComponent: () =>
+          import('./features/ingredientes/ingredientes-list.component').then((m) => m.IngredientesListComponent),
+      },
+      {
+        path: 'ingredientes/novo',
+        loadComponent: () =>
+          import('./features/ingredientes/ingrediente-form.component').then((m) => m.IngredienteFormComponent),
+      },
+      {
+        path: 'ingredientes/:id',
+        loadComponent: () =>
+          import('./features/ingredientes/ingrediente-form.component').then((m) => m.IngredienteFormComponent),
+      },
+      {
+        path: 'markups',
+        loadComponent: () =>
+          import('./features/markups/markups-list.component').then((m) => m.MarkupsListComponent),
+      },
     ],
   },
   {
