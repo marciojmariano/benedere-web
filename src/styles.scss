@@ -60,3 +60,47 @@ body {
     }
   }
 }
+
+// Corrige cor de fundo das tabelas PrimeNG
+.p-datatable {
+  .p-datatable-header {
+    background-color: #ffffff !important;
+    color: #2c2c2c !important;
+  }
+
+  .p-datatable-thead > tr > th {
+    background-color: #f9fafb !important;
+    color: #374151 !important;
+    border-bottom: 2px solid #e5e7eb !important;
+    font-weight: 600 !important;
+  }
+
+  .p-datatable-tbody > tr {
+    background-color: #ffffff !important;
+    color: #2c2c2c !important;
+
+    &:hover {
+      background-color: #fdf6f3 !important;
+    }
+
+    > td {
+      border-bottom: 1px solid #f3f4f6 !important;
+    }
+  }
+
+  .p-datatable-tfoot > tr > td {
+    background-color: #f9fafb !important;
+    color: #2c2c2c !important;
+  }
+
+  .p-paginator {
+    background-color: #ffffff !important;
+    color: #2c2c2c !important;
+    border-top: 1px solid #e5e7eb !important;
+
+    .p-paginator-page.p-highlight {
+      background-color: #e75d23 !important;
+      color: #ffffff !important;
+    }
+  }
+}
