@@ -47,7 +47,16 @@ export class PedidosListComponent implements OnInit {
     };
     return map[status] || 'secondary';
   }
-
+  statusLabel(status: StatusPedido): string {
+    const map: Record<string, string> = {
+      aguardando_producao: 'Aguardando',
+      em_producao: 'Em Produção',
+      pronto: 'Pronto',
+      entregue: 'Entregue',
+      cancelado: 'Cancelado',
+    };
+    return map[status] || status;
+  }
   baixarPdf(p: Pedido, event: Event): void {
     event.stopPropagation();
     this.service.downloadPdf(p.id).subscribe({

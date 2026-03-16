@@ -31,8 +31,8 @@
       <ng-template pTemplate="body" let-o>
         <tr class="cursor-pointer" (click)="ver(o)">
           <td class="font-medium">{{ o.numero }}</td>
-          <td>{{ o.cliente_id }}</td>
-          <td><p-tag [value]="o.status" [severity]="statusSeverity(o.status)" /></td>
+          <td>{{ nomeCliente(o.cliente_id) }}</td>
+          <p-tag [value]="statusLabel(o.status)" [severity]="statusSeverity(o.status)" />
           <td>R$ {{ o.preco_final }}</td>
           <td>{{ o.validade_dias }} dias</td>
           <td>

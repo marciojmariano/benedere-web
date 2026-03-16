@@ -22,7 +22,7 @@
       <ng-template pTemplate="body" let-p>
         <tr class="cursor-pointer" (click)="ver(p)">
           <td class="font-medium">{{ p.numero }}</td>
-          <td><p-tag [value]="p.status" [severity]="statusSeverity(p.status)" /></td>
+          <p-tag [value]="statusLabel(p.status)" [severity]="statusSeverity(p.status)" />
           <td>R$ {{ p.valor_total }}</td>
           <td>{{ p.data_entrega_prevista ? (p.data_entrega_prevista | date:'dd/MM/yyyy') : 'A definir' }}</td>
           <td>
