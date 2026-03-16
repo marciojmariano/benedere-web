@@ -68,6 +68,31 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/markups/markups-list.component').then((m) => m.MarkupsListComponent),
       },
+      {
+        path: 'orcamentos',
+        loadComponent: () =>
+          import('./features/orcamentos/orcamentos-list.component').then((m) => m.OrcamentosListComponent),
+      },
+      {
+        path: 'orcamentos/novo',
+        loadComponent: () =>
+          import('./features/orcamentos/orcamento-form.component').then((m) => m.OrcamentoFormComponent),
+      },
+      {
+        path: 'orcamentos/:id',
+        loadComponent: () =>
+          import('./features/orcamentos/orcamento-detail.component').then((m) => m.OrcamentoDetailComponent),
+      },
+      {
+        path: 'pedidos',
+        loadComponent: () =>
+          import('./features/pedidos/pedidos-list.component').then((m) => m.PedidosListComponent),
+      },
+      {
+        path: 'pedidos/:id',
+        loadComponent: () =>
+          import('./features/pedidos/pedido-detail.component').then((m) => m.PedidoDetailComponent),
+      },
     ],
   },
   {
