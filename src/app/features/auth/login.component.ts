@@ -14,7 +14,6 @@ export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
 
   ngOnInit(): void {
-    // Este é o GATILHO que faltava!
     this.auth.loginWithRedirect();
   }
 }
