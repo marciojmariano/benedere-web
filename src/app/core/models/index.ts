@@ -55,6 +55,7 @@ export interface Cliente {
   observacoes: string | null;
   ativo: boolean;
   nutricionista_id: string | null;
+  markup_id_padrao: string | null;
   created_at: string;
   updated_at: string;
 }

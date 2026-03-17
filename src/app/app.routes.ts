@@ -68,6 +68,31 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/markups/markups-list.component').then((m) => m.MarkupsListComponent),
       },
+       {
+        path: 'markups/novo',
+        loadComponent: () =>
+          import('./features/markups/markup-form.component').then((m) => m.MarkupFormComponent),
+      },
+      {
+        path: 'markups/:id',
+        loadComponent: () =>
+          import('./features/markups/markup-form.component').then((m) => m.MarkupFormComponent),
+      },
+      {
+        path: 'indices-markup',
+        loadComponent: () =>
+          import('./features/markups/indice-markup-list.component').then((m) => m.IndiceMarkupListComponent),
+      },
+      {
+        path: 'indices-markup/novo',
+        loadComponent: () =>
+          import('./features/markups/indice-markup-form.component').then((m) => m.IndiceMarkupFormComponent),
+      },
+      {
+        path: 'indices-markup/:id',
+        loadComponent: () =>
+          import('./features/markups/indice-markup-form.component').then((m) => m.IndiceMarkupFormComponent),
+      },
       {
         path: 'orcamentos',
         loadComponent: () =>

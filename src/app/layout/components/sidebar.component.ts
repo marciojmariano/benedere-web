@@ -23,13 +23,14 @@ interface MenuItem {
   `],
 })
 export class SidebarComponent {
-  menuItems: MenuItem[] = [
-    { label: 'Dashboard', icon: 'pi pi-home', route: '/' },
-    { label: 'Clientes', icon: 'pi pi-users', route: '/clientes' },
-    { label: 'Nutricionistas', icon: 'pi pi-heart', route: '/nutricionistas' },
-    { label: 'Ingredientes', icon: 'pi pi-box', route: '/ingredientes' },
-    { label: 'Markups', icon: 'pi pi-percentage', route: '/markups' },
-    { label: 'Orçamentos', icon: 'pi pi-file', route: '/orcamentos' },
-    { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/pedidos' },
-  ];
+menuItems: MenuItem[] = [
+  { label: 'Dashboard', icon: 'pi pi-home', route: '/' },
+  { label: 'Clientes', icon: 'pi pi-users', route: '/clientes' },
+  { label: 'Nutricionistas', icon: 'pi pi-heart', route: '/nutricionistas' },
+  { label: 'Ingredientes', icon: 'pi pi-box', route: '/ingredientes' },
+  { label: 'Índices de Markup', icon: 'pi pi-list', route: '/indices-markup' },  // ← adicione
+  { label: 'Markups', icon: 'pi pi-percentage', route: '/markups' },
+  { label: 'Orçamentos', icon: 'pi pi-file', route: '/orcamentos' },
+  { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/pedidos' },
+];
 }

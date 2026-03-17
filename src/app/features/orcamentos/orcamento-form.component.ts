@@ -58,6 +58,15 @@ export class OrcamentoFormComponent implements OnInit {
     this.clienteService.listar().subscribe({ next: (data) => this.clientes = data });
     this.markupService.listar().subscribe({ next: (data) => this.markups = data });
     this.ingredienteService.listar().subscribe({ next: (data) => this.ingredientes = data });
+
+    this.form.get('cliente_id')?.valueChanges.subscribe((clienteId) => {
+    if (clienteId) {
+      const cliente = this.clientes.find((c) => c.id === clienteId);
+      if (cliente?.markup_id_padrao) {
+        this.form.get('markup_id')?.setValue(cliente.markup_id_padrao);
+      }
+    }
+  });
   }
 
   get itens(): FormArray { return this.form.get('itens') as FormArray; }

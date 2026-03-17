@@ -7,7 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-
+import { MarkupService } from '../../core/services/markup.service';
+import { Markup } from '../../core/models';
 import { ClienteService } from '../../core/services/cliente.service';
 import { NutricionistaService } from '../../core/services/nutricionista.service';
 import { Nutricionista } from '../../core/models';
@@ -30,20 +31,24 @@ export class ClienteFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private clienteService = inject(ClienteService);
   private nutricionistaService = inject(NutricionistaService);
+  private markupService = inject(MarkupService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private messageService = inject(MessageService);
 
   form!: FormGroup;
   nutricionistas: Nutricionista[] = [];
+  markups: Markup[] = [];
   loading = false;
   salvando = false;
   clienteId: string | null = null;
+  
 
   ngOnInit(): void {
     this.clienteId = this.route.snapshot.paramMap.get('id');
     this.inicializarForm();
     this.carregarNutricionistas();
+    this.markupService.listar().subscribe({ next: (data) => this.markups = data });
     if (this.clienteId) {
       this.carregarCliente();
     }
@@ -57,6 +62,7 @@ export class ClienteFormComponent implements OnInit {
       endereco: [''],
       observacoes: [''],
       nutricionista_id: [null],
+      markup_id_padrao: [null],
     });
   }
 

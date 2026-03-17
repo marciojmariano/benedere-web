@@ -99,6 +99,19 @@
           class="w-full"
         />
       </div>
+      <!-- Markup Padrão -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Markup Padrão (opcional)</label>
+        <p-select
+          formControlName="markup_id_padrao"
+          [options]="markups"
+          optionLabel="nome"
+          optionValue="id"
+          placeholder="Selecione um markup padrão"
+          [showClear]="true"
+          styleClass="w-full"
+        />
+      </div>
 
       <!-- Botões -->
       <div class="flex gap-3 justify-end">
