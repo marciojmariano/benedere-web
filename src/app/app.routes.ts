@@ -36,17 +36,17 @@ export const routes: Routes = [
       {
         path: 'nutricionistas',
         loadComponent: () =>
-           import('./features/nutricionistas/nutricionistas-list.component').then((m) => m.NutricionistasListComponent),
+          import('./features/nutricionistas/nutricionistas-list.component').then((m) => m.NutricionistasListComponent),
       },
       {
         path: 'nutricionistas/novo',
         loadComponent: () =>
-            import('./features/nutricionistas/nutricionista-form.component').then((m) => m.NutricionistaFormComponent),
+          import('./features/nutricionistas/nutricionista-form.component').then((m) => m.NutricionistaFormComponent),
       },
       {
         path: 'nutricionistas/:id',
         loadComponent: () =>
-            import('./features/nutricionistas/nutricionista-form.component').then((m) => m.NutricionistaFormComponent),
+          import('./features/nutricionistas/nutricionista-form.component').then((m) => m.NutricionistaFormComponent),
       },
       {
         path: 'ingredientes',
@@ -63,12 +63,29 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/ingredientes/ingrediente-form.component').then((m) => m.IngredienteFormComponent),
       },
+      // ── Produtos (catálogo) ──────────────────────────────────────────────
+      {
+        path: 'produtos',
+        loadComponent: () =>
+          import('./features/produtos/produtos-list.component').then((m) => m.ProdutosListComponent),
+      },
+      {
+        path: 'produtos/novo',
+        loadComponent: () =>
+          import('./features/produtos/produto-form.component').then((m) => m.ProdutoFormComponent),
+      },
+      {
+        path: 'produtos/:id',
+        loadComponent: () =>
+          import('./features/produtos/produto-form.component').then((m) => m.ProdutoFormComponent),
+      },
+      // ── Markups ──────────────────────────────────────────────────────────
       {
         path: 'markups',
         loadComponent: () =>
           import('./features/markups/markups-list.component').then((m) => m.MarkupsListComponent),
       },
-       {
+      {
         path: 'markups/novo',
         loadComponent: () =>
           import('./features/markups/markup-form.component').then((m) => m.MarkupFormComponent),
@@ -93,21 +110,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/markups/indice-markup-form.component').then((m) => m.IndiceMarkupFormComponent),
       },
-      {
-        path: 'orcamentos',
-        loadComponent: () =>
-          import('./features/orcamentos/orcamentos-list.component').then((m) => m.OrcamentosListComponent),
-      },
-      {
-        path: 'orcamentos/novo',
-        loadComponent: () =>
-          import('./features/orcamentos/orcamento-form.component').then((m) => m.OrcamentoFormComponent),
-      },
-      {
-        path: 'orcamentos/:id',
-        loadComponent: () =>
-          import('./features/orcamentos/orcamento-detail.component').then((m) => m.OrcamentoDetailComponent),
-      },
+      // ── Pedidos (rotas mantidas — serão atualizadas no Épico 2 Frontend) ─
       {
         path: 'pedidos',
         loadComponent: () =>

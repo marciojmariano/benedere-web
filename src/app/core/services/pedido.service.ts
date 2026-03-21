@@ -1,35 +1,46 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiService } from './api.service';
-import { Pedido, StatusPedido } from '../models';
 
-@Injectable({ providedIn: 'root' })
+import { ApiService } from './api.service';
+import { Pedido, PedidoResumo, StatusPedido } from '../models';
+
+@Injectable({
+  providedIn: 'root',
+})
 export class PedidoService extends ApiService {
 
-  listar(clienteId?: string, status?: StatusPedido): Observable<Pedido[]> {
-    const params: any = {};
+  listar(status?: StatusPedido, clienteId?: string): Observable<PedidoResumo[]> {
+    const params: Record<string, any> = {};
+    if (status) params['status'] = status;
     if (clienteId) params['cliente_id'] = clienteId;
-    if (status) params['status_pedido'] = status;
-    return this.get<Pedido[]>('/pedidos/', params);
+    return this.get<PedidoResumo[]>('/pedidos/', params);
   }
 
   buscarPorId(id: string): Observable<Pedido> {
     return this.get<Pedido>(`/pedidos/${id}`);
   }
 
-  criarDePedido(dados: any): Observable<Pedido> {
+  criar(dados: { cliente_id: string; markup_id?: string; observacoes?: string }): Observable<Pedido> {
     return this.post<Pedido>('/pedidos/', dados);
   }
 
-  atualizar(id: string, dados: any): Observable<Pedido> {
+  atualizar(id: string, dados: Partial<{ observacoes: string; data_entrega_prevista: string }>): Observable<Pedido> {
     return this.patch<Pedido>(`/pedidos/${id}`, dados);
   }
 
-  mudarStatus(id: string, novoStatus: StatusPedido): Observable<Pedido> {
-    return this.patch<Pedido>(`/pedidos/${id}/status?novo_status=${novoStatus}`, {});
+  deletar(id: string): Observable<void> {
+    return this.delete<void>(`/pedidos/${id}`);
   }
 
-  downloadPdf(id: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/pdf/pedidos/${id}/download`, { responseType: 'blob' });
+  mudarStatus(id: string, status: StatusPedido): Observable<Pedido> {
+    return this.patch<Pedido>(`/pedidos/${id}/status`, { status });
+  }
+
+  adicionarItem(pedidoId: string, item: any): Observable<Pedido> {
+    return this.post<Pedido>(`/pedidos/${pedidoId}/itens`, item);
+  }
+
+  removerItem(pedidoId: string, itemId: string): Observable<Pedido> {
+    return this.delete<Pedido>(`/pedidos/${pedidoId}/itens/${itemId}`);
   }
 }

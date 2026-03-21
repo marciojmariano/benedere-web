@@ -1,0 +1,50 @@
+<div>
+  <p-toast />
+  <p-confirmDialog />
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">Produtos</h2>
+      <p class="text-gray-500 text-sm mt-1">Catálogo de produtos de série</p>
+    </div>
+    <p-button label="Novo Produto" icon="pi pi-plus" (onClick)="novo()" />
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+    <p-table #dt [value]="produtos" [loading]="loading" [paginator]="true" [rows]="10"
+             [globalFilterFields]="['nome']" styleClass="p-datatable-sm">
+      <ng-template pTemplate="caption">
+        <div class="flex justify-end">
+          <input pInputText type="text" placeholder="Buscar produto..." class="w-64"
+                 (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="nome">Nome <p-sortIcon field="nome" /></th>
+          <th>Tipo Refeição</th>
+          <th>Peso</th>
+          <th>Status</th>
+          <th style="width: 120px">Ações</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-p>
+        <tr>
+          <td class="font-medium">{{ p.nome }}</td>
+          <td>{{ getTipoRefeicaoLabel(p.tipo_refeicao) }}</td>
+          <td>{{ p.peso_total_g }}g</td>
+          <td><p-tag [value]="p.ativo ? 'Ativo' : 'Inativo'" [severity]="p.ativo ? 'success' : 'danger'" /></td>
+          <td>
+            <div class="flex gap-2">
+              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="editar(p)" />
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="confirmarDesativar(p)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="5" class="text-center text-gray-400 py-8">Nenhum produto encontrado</td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

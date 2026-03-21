@@ -8,21 +8,52 @@ export enum UnidadeMedida {
   UNIDADE = 'unidade',
 }
 
-export enum StatusOrcamento {
-  RASCUNHO = 'rascunho',
-  ENVIADO = 'enviado',
-  APROVADO = 'aprovado',
-  REPROVADO = 'reprovado',
-  CANCELADO = 'cancelado',
+export enum TipoRefeicao {
+  CAFE_MANHA = 'cafe_manha',
+  LANCHE_MANHA = 'lanche_manha',
+  ALMOCO = 'almoco',
+  LANCHE_TARDE = 'lanche_tarde',
+  JANTAR = 'jantar',
 }
 
 export enum StatusPedido {
-  AGUARDANDO_PRODUCAO = 'aguardando_producao',
+  RASCUNHO = 'rascunho',
+  APROVADO = 'aprovado',
   EM_PRODUCAO = 'em_producao',
-  PRONTO = 'pronto',
   ENTREGUE = 'entregue',
   CANCELADO = 'cancelado',
 }
+
+export enum TipoItem {
+  SERIE = 'serie',
+  PERSONALIZADO = 'personalizado',
+}
+
+// ── Labels para exibição ─────────────────────────────────────────────────────
+
+export const TIPO_REFEICAO_LABELS: Record<TipoRefeicao, string> = {
+  [TipoRefeicao.CAFE_MANHA]: 'Café da Manhã',
+  [TipoRefeicao.LANCHE_MANHA]: 'Lanche Manhã',
+  [TipoRefeicao.ALMOCO]: 'Almoço',
+  [TipoRefeicao.LANCHE_TARDE]: 'Lanche Tarde',
+  [TipoRefeicao.JANTAR]: 'Jantar',
+};
+
+export const STATUS_PEDIDO_LABELS: Record<StatusPedido, string> = {
+  [StatusPedido.RASCUNHO]: 'Rascunho',
+  [StatusPedido.APROVADO]: 'Aprovado',
+  [StatusPedido.EM_PRODUCAO]: 'Em Produção',
+  [StatusPedido.ENTREGUE]: 'Entregue',
+  [StatusPedido.CANCELADO]: 'Cancelado',
+};
+
+export const STATUS_PEDIDO_SEVERITY: Record<StatusPedido, string> = {
+  [StatusPedido.RASCUNHO]: 'secondary',
+  [StatusPedido.APROVADO]: 'info',
+  [StatusPedido.EM_PRODUCAO]: 'warn',
+  [StatusPedido.ENTREGUE]: 'success',
+  [StatusPedido.CANCELADO]: 'danger',
+};
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
 
@@ -93,61 +124,82 @@ export interface Ingrediente {
   updated_at: string;
 }
 
-export interface OrcamentoItem {
+// ── Produto (Catálogo) ───────────────────────────────────────────────────────
+
+export interface ProdutoComposicao {
   id: string;
   ingrediente_id: string;
-  quantidade: string;
-  unidade_medida: UnidadeMedida;
-  custo_unitario_snapshot: string;
-  markup_fator_snapshot: string | null;
-  custo_total_item: string;
-  preco_item_com_markup: string;
-  observacoes: string | null;
+  ingrediente_nome: string | null;
+  ingrediente_custo_unitario: string | null;
+  quantidade_g: string;
+  ordem: number;
+  custo_item: string | null;
+  kcal_item: string | null;
 }
 
-export interface Orcamento {
+export interface Produto {
   id: string;
-  numero: string;
-  cliente_id: string;
-  status: StatusOrcamento;
-  markup_id: string | null;
-  custo_ingredientes: string;
-  custo_embalagem: string;
-  taxa_entrega: string;
-  custo_total: string;
-  preco_final: string;
-  validade_dias: number;
-  observacoes: string | null;
-  itens: OrcamentoItem[];
+  nome: string;
+  tipo_refeicao: TipoRefeicao | null;
+  peso_total_g: string;
+  descricao: string | null;
+  ativo: boolean;
   created_at: string;
   updated_at: string;
 }
 
-export interface PedidoItem {
+export interface ProdutoDetalhe extends Produto {
+  composicao: ProdutoComposicao[];
+  custo_total: string | null;
+  kcal_total: string | null;
+}
+
+// ── Pedido (Unificado) ──────────────────────────────────────────────────────
+
+export interface PedidoItemComposicao {
   id: string;
   ingrediente_id: string;
-  nome_ingrediente_snapshot: string;
-  quantidade: string;
-  unidade_medida: UnidadeMedida;
-  custo_unitario_snapshot: string;
-  custo_total_item: string;
+  ingrediente_nome_snap: string;
+  quantidade_g: string;
+  custo_kg_snapshot: string;
+  kcal_snapshot: string;
+}
+
+export interface PedidoItem {
+  id: string;
+  produto_id: string | null;
+  nome_snapshot: string;
+  tipo_refeicao: TipoRefeicao | null;
+  tipo: TipoItem;
+  quantidade: number;
+  preco_unitario: string;
+  preco_total: string;
+  composicao: PedidoItemComposicao[];
 }
 
 export interface Pedido {
   id: string;
   numero: string;
-  orcamento_id: string;
   cliente_id: string;
+  markup_id: string | null;
   status: StatusPedido;
   valor_total: string;
-  taxa_entrega: string;
-  custo_embalagem: string;
+  observacoes: string | null;
   data_entrega_prevista: string | null;
   data_entrega_realizada: string | null;
-  observacoes: string | null;
   itens: PedidoItem[];
   created_at: string;
   updated_at: string;
+}
+
+export interface PedidoResumo {
+  id: string;
+  numero: string;
+  cliente_id: string;
+  status: StatusPedido;
+  valor_total: string;
+  total_itens: number;
+  created_at: string;
 }
 
 // ── Paginação ─────────────────────────────────────────────────────────────────

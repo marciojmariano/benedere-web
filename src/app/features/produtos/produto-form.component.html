@@ -1,0 +1,107 @@
+<div>
+  <p-toast />
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">{{ isEdicao ? 'Editar Produto' : 'Novo Produto' }}</h2>
+      <p class="text-gray-500 text-sm mt-1">{{ isEdicao ? 'Altere os dados do produto e sua receita' : 'Cadastre um novo produto no catálogo' }}</p>
+    </div>
+    <p-button label="Voltar" icon="pi pi-arrow-left" [outlined]="true" (onClick)="voltar()" />
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <!-- Dados básicos -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Dados do Produto</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-600">Nome *</label>
+          <input pInputText formControlName="nome" placeholder="Ex: Escondidinho de Ragu" />
+          @if (isInvalid('nome')) {
+            <small class="text-red-500">Nome é obrigatório (mín. 2 caracteres)</small>
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-600">Tipo de Refeição</label>
+          <p-select formControlName="tipo_refeicao" [options]="tiposRefeicao"
+                    optionLabel="label" optionValue="value" placeholder="Selecione..." [showClear]="true" />
+        </div>
+
+        <div class="md:col-span-2 flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-600">Descrição</label>
+          <textarea pTextarea formControlName="descricao" rows="2" placeholder="Descrição opcional do produto"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Composição (receita) -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-700">Composição (Receita)</h3>
+        <p-button label="Adicionar Ingrediente" icon="pi pi-plus" size="small" [outlined]="true"
+                  (onClick)="adicionarIngrediente()" />
+      </div>
+
+      @if (composicaoArray.length === 0) {
+        <div class="text-center text-gray-400 py-8 border-2 border-dashed border-gray-200 rounded-lg">
+          <i class="pi pi-box text-3xl mb-2"></i>
+          <p>Nenhum ingrediente adicionado</p>
+          <p class="text-sm">Clique em "Adicionar Ingrediente" para montar a receita</p>
+        </div>
+      }
+
+      <div formArrayName="composicao" class="flex flex-col gap-3">
+        @for (item of composicaoArray.controls; track item; let i = $index) {
+          <div [formGroupName]="i" class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <span class="text-gray-400 font-mono text-sm w-6">{{ i + 1 }}</span>
+
+            <div class="flex-1">
+              <p-select formControlName="ingrediente_id" [options]="ingredientes"
+                        optionLabel="nome" optionValue="id" placeholder="Selecione o ingrediente..."
+                        [filter]="true" filterPlaceholder="Buscar..." class="w-full" />
+            </div>
+
+            <div class="w-32">
+              <p-inputNumber formControlName="quantidade_g" suffix=" g" [min]="0.01"
+                             [maxFractionDigits]="2" placeholder="Qtd (g)" class="w-full" />
+            </div>
+
+            <div class="w-28 text-right text-sm">
+              @if (item.value.ingrediente_id && item.value.quantidade_g) {
+                <div class="text-green-600 font-medium">
+                  R$ {{ calcularCustoItem(item.value.ingrediente_id, item.value.quantidade_g) | number:'1.2-4' }}
+                </div>
+              }
+            </div>
+
+            <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger"
+                      (onClick)="removerIngrediente(i)" />
+          </div>
+        }
+      </div>
+
+      <!-- Totais -->
+      @if (composicaoArray.length > 0) {
+        <p-divider />
+        <div class="flex justify-end gap-8 text-sm">
+          <div>
+            <span class="text-gray-500">Peso total:</span>
+            <span class="font-semibold text-gray-700 ml-2">{{ pesoTotal | number:'1.0-2' }}g</span>
+          </div>
+          <div>
+            <span class="text-gray-500">Custo total:</span>
+            <span class="font-semibold text-green-600 ml-2">R$ {{ custoTotal | number:'1.2-4' }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Botões -->
+    <div class="flex justify-end gap-3">
+      <p-button label="Cancelar" [outlined]="true" (onClick)="voltar()" />
+      <p-button label="Salvar" icon="pi pi-check" type="submit" [loading]="salvando" />
+    </div>
+  </form>
+</div>
