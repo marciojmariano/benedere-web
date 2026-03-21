@@ -1,106 +1,93 @@
 <div>
   <p-toast />
 
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800">{{ isEdicao ? 'Editar Produto' : 'Novo Produto' }}</h2>
-      <p class="text-gray-500 text-sm mt-1">{{ isEdicao ? 'Altere os dados do produto e sua receita' : 'Cadastre um novo produto no catálogo' }}</p>
-    </div>
-    <p-button label="Voltar" icon="pi pi-arrow-left" [outlined]="true" (onClick)="voltar()" />
-  </div>
+  <app-page-header
+    [title]="isEdicao ? 'Editar Produto' : 'Novo Produto'"
+    [subtitle]="isEdicao ? 'Altere os dados do produto e sua receita' : 'Cadastre um novo produto no catálogo'"
+  >
+    <p-button label="Voltar" icon="pi pi-arrow-left" [outlined]="true" severity="secondary" (onClick)="voltar()" />
+  </app-page-header>
 
   <form [formGroup]="form" (ngSubmit)="salvar()">
-    <!-- Dados básicos -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
-      <h3 class="text-lg font-semibold text-gray-700 mb-4">Dados do Produto</h3>
+    <div class="bg-white rounded-2xl shadow-sm border border-zinc-100 overflow-hidden">
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium text-gray-600">Nome *</label>
-          <input pInputText formControlName="nome" placeholder="Ex: Escondidinho de Ragu" />
-          @if (isInvalid('nome')) {
-            <small class="text-red-500">Nome é obrigatório (mín. 2 caracteres)</small>
-          }
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium text-gray-600">Tipo de Refeição</label>
-          <p-select formControlName="tipo_refeicao" [options]="tiposRefeicao"
-                    optionLabel="label" optionValue="value" placeholder="Selecione..." [showClear]="true" />
-        </div>
-
-        <div class="md:col-span-2 flex flex-col gap-1">
-          <label class="text-sm font-medium text-gray-600">Descrição</label>
-          <textarea pTextarea formControlName="descricao" rows="2" placeholder="Descrição opcional do produto"></textarea>
+      <!-- Tabs -->
+      <div class="border-b border-zinc-100">
+        <div class="flex">
+          <button type="button"
+            class="px-6 py-3 text-sm font-semibold transition-colors border-b-2"
+            [class]="activeTab === 0
+              ? 'text-emerald-600 border-emerald-500'
+              : 'text-zinc-400 border-transparent hover:text-zinc-600'"
+            (click)="activeTab = 0"
+          >
+            <i class="pi pi-info-circle mr-2"></i>Informações
+          </button>
+          <button type="button"
+            class="px-6 py-3 text-sm font-semibold transition-colors border-b-2"
+            [class]="activeTab === 1
+              ? 'text-emerald-600 border-emerald-500'
+              : 'text-zinc-400 border-transparent hover:text-zinc-600'"
+            (click)="activeTab = 1"
+          >
+            <i class="pi pi-box mr-2"></i>Composição
+            @if (composicaoAtual.length > 0) {
+              <span class="ml-2 px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-700">
+                {{ composicaoAtual.length }}
+              </span>
+            }
+          </button>
         </div>
       </div>
-    </div>
 
-    <!-- Composição (receita) -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-700">Composição (Receita)</h3>
-        <p-button label="Adicionar Ingrediente" icon="pi pi-plus" size="small" [outlined]="true"
-                  (onClick)="adicionarIngrediente()" />
-      </div>
-
-      @if (composicaoArray.length === 0) {
-        <div class="text-center text-gray-400 py-8 border-2 border-dashed border-gray-200 rounded-lg">
-          <i class="pi pi-box text-3xl mb-2"></i>
-          <p>Nenhum ingrediente adicionado</p>
-          <p class="text-sm">Clique em "Adicionar Ingrediente" para montar a receita</p>
-        </div>
-      }
-
-      <div formArrayName="composicao" class="flex flex-col gap-3">
-        @for (item of composicaoArray.controls; track item; let i = $index) {
-          <div [formGroupName]="i" class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <span class="text-gray-400 font-mono text-sm w-6">{{ i + 1 }}</span>
-
-            <div class="flex-1">
-              <p-select formControlName="ingrediente_id" [options]="ingredientes"
-                        optionLabel="nome" optionValue="id" placeholder="Selecione o ingrediente..."
-                        [filter]="true" filterPlaceholder="Buscar..." class="w-full" />
-            </div>
-
-            <div class="w-32">
-              <p-inputNumber formControlName="quantidade_g" suffix=" g" [min]="0.01"
-                             [maxFractionDigits]="2" placeholder="Qtd (g)" class="w-full" />
-            </div>
-
-            <div class="w-28 text-right text-sm">
-              @if (item.value.ingrediente_id && item.value.quantidade_g) {
-                <div class="text-green-600 font-medium">
-                  R$ {{ calcularCustoItem(item.value.ingrediente_id, item.value.quantidade_g) | number:'1.2-4' }}
-                </div>
+      <!-- Tab: Informações -->
+      @if (activeTab === 0) {
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Nome *</label>
+              <input pInputText formControlName="nome" placeholder="Ex: Escondidinho de Ragu" />
+              @if (isInvalid('nome')) {
+                <small class="text-rose-500 text-xs">Nome é obrigatório (mín. 2 caracteres)</small>
               }
             </div>
 
-            <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger"
-                      (onClick)="removerIngrediente(i)" />
-          </div>
-        }
-      </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Tipo de Refeição</label>
+              <p-select formControlName="tipo_refeicao" [options]="tiposRefeicao"
+                        optionLabel="label" optionValue="value" placeholder="Selecione..." [showClear]="true" />
+            </div>
 
-      <!-- Totais -->
-      @if (composicaoArray.length > 0) {
-        <p-divider />
-        <div class="flex justify-end gap-8 text-sm">
-          <div>
-            <span class="text-gray-500">Peso total:</span>
-            <span class="font-semibold text-gray-700 ml-2">{{ pesoTotal | number:'1.0-2' }}g</span>
+            <div class="md:col-span-2 flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Descrição</label>
+              <textarea pTextarea formControlName="descricao" rows="3" placeholder="Descrição opcional do produto"></textarea>
+            </div>
           </div>
-          <div>
-            <span class="text-gray-500">Custo total:</span>
-            <span class="font-semibold text-green-600 ml-2">R$ {{ custoTotal | number:'1.2-4' }}</span>
-          </div>
+        </div>
+      }
+
+      <!-- Tab: Composição (drag-drop component) -->
+      @if (activeTab === 1) {
+        <div class="p-6">
+          @if (ingredientes.length > 0) {
+            <app-produto-composicao
+              [ingredientes]="ingredientes"
+              [initialItems]="composicaoInicial"
+              (composicaoChange)="onComposicaoChange($event)"
+            />
+          } @else {
+            <div class="text-center py-8 text-zinc-400">
+              <i class="pi pi-spin pi-spinner text-2xl mb-2"></i>
+              <p>Carregando ingredientes...</p>
+            </div>
+          }
         </div>
       }
     </div>
 
     <!-- Botões -->
-    <div class="flex justify-end gap-3">
-      <p-button label="Cancelar" [outlined]="true" (onClick)="voltar()" />
+    <div class="flex justify-end gap-3 mt-6">
+      <p-button label="Cancelar" [outlined]="true" severity="secondary" (onClick)="voltar()" />
       <p-button label="Salvar" icon="pi pi-check" type="submit" [loading]="salvando" />
     </div>
   </form>

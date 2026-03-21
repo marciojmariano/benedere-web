@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -11,11 +10,16 @@ import { InputTextModule } from 'primeng/inputtext';
 
 import { ProdutoService } from '../../core/services/produto.service';
 import { Produto, TipoRefeicao, TIPO_REFEICAO_LABELS } from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 
 @Component({
   selector: 'app-produtos-list',
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TagModule, ToastModule, ConfirmDialogModule, InputTextModule],
+  imports: [
+    CommonModule, TableModule, ButtonModule, ToastModule, ConfirmDialogModule,
+    InputTextModule, PageHeaderComponent, StatusBadgeComponent,
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './produtos-list.component.html',
 })
@@ -27,8 +31,10 @@ export class ProdutosListComponent implements OnInit {
 
   produtos: Produto[] = [];
   loading = false;
+  filtroTipo: TipoRefeicao | null = null;
 
   tipoRefeicaoLabels = TIPO_REFEICAO_LABELS;
+  tiposRefeicao = Object.values(TipoRefeicao);
 
   ngOnInit(): void { this.carregar(); }
 
@@ -36,8 +42,20 @@ export class ProdutosListComponent implements OnInit {
     this.loading = true;
     this.service.listar().subscribe({
       next: (data) => { this.produtos = data; this.loading = false; },
-      error: () => { this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao carregar produtos' }); this.loading = false; },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao carregar produtos' });
+        this.loading = false;
+      },
     });
+  }
+
+  get produtosFiltrados(): Produto[] {
+    if (!this.filtroTipo) return this.produtos;
+    return this.produtos.filter(p => p.tipo_refeicao === this.filtroTipo);
+  }
+
+  toggleFiltroTipo(tipo: TipoRefeicao): void {
+    this.filtroTipo = this.filtroTipo === tipo ? null : tipo;
   }
 
   novo(): void { this.router.navigate(['/produtos/novo']); }
@@ -53,7 +71,10 @@ export class ProdutosListComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: () => this.service.desativar(p.id).subscribe({
-        next: () => { this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Produto desativado' }); this.carregar(); },
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Produto desativado' });
+          this.carregar();
+        },
         error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao desativar' }),
       }),
     });

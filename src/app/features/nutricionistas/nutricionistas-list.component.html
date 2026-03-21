@@ -2,44 +2,62 @@
   <p-toast />
   <p-confirmDialog />
 
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800">Nutricionistas</h2>
-      <p class="text-gray-500 text-sm mt-1">Gerencie os nutricionistas cadastrados</p>
-    </div>
+  <app-page-header title="Nutricionistas" subtitle="Gerencie os nutricionistas cadastrados">
     <p-button label="Novo Nutricionista" icon="pi pi-plus" (onClick)="novo()" />
-  </div>
+  </app-page-header>
 
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-    <p-table [value]="nutricionistas" [loading]="loading" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Nome</th>
-          <th>CRN</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Status</th>
-          <th style="width: 120px">Ações</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-n>
-        <tr>
-          <td class="font-medium">{{ n.nome }}</td>
-          <td>{{ n.crn }}</td>
-          <td>{{ n.email || '—' }}</td>
-          <td>{{ n.telefone || '—' }}</td>
-          <td><p-tag [value]="n.ativo ? 'Ativo' : 'Inativo'" [severity]="n.ativo ? 'success' : 'danger'" /></td>
-          <td>
-            <div class="flex gap-2">
-              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="editar(n)" />
-              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="confirmarDesativar(n)" />
+  @if (loading) {
+    <div class="flex items-center justify-center h-48">
+      <i class="pi pi-spin pi-spinner text-3xl text-emerald-500"></i>
+    </div>
+  } @else if (nutricionistas.length === 0) {
+    <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-200 p-12 text-center">
+      <i class="pi pi-heart text-4xl text-zinc-300 mb-3"></i>
+      <p class="text-zinc-400 font-medium">Nenhum nutricionista encontrado</p>
+    </div>
+  } @else {
+    <!-- Card grid layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (n of nutricionistas; track n.id) {
+        <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <app-avatar [name]="n.nome" size="md" />
+              <div>
+                <h3 class="font-semibold text-zinc-800">{{ n.nome }}</h3>
+                <p class="text-xs text-zinc-400">CRN: {{ n.crn || '—' }}</p>
+              </div>
             </div>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr><td colspan="6" class="text-center text-gray-400 py-8">Nenhum nutricionista encontrado</td></tr>
-      </ng-template>
-    </p-table>
-  </div>
+            <app-status-badge [status]="n.ativo ? 'ativo' : 'inativo'" />
+          </div>
+
+          <div class="space-y-1.5 mb-4">
+            @if (n.email) {
+              <div class="flex items-center gap-2 text-sm text-zinc-500">
+                <i class="pi pi-envelope text-xs text-zinc-400"></i>
+                <span class="truncate">{{ n.email }}</span>
+              </div>
+            }
+            @if (n.telefone) {
+              <div class="flex items-center gap-2 text-sm text-zinc-500">
+                <i class="pi pi-phone text-xs text-zinc-400"></i>
+                <span>{{ n.telefone }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="flex gap-2 pt-3 border-t border-zinc-100">
+            <button class="flex-1 py-2 rounded-lg text-sm font-medium text-emerald-600 hover:bg-emerald-50 transition-colors"
+                    (click)="editar(n)">
+              <i class="pi pi-pencil mr-1.5"></i>Editar
+            </button>
+            <button class="py-2 px-3 rounded-lg text-sm text-zinc-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                    (click)="confirmarDesativar(n)">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

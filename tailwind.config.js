@@ -7,15 +7,26 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#e75d23',
-          light: '#f07a47',
-          dark: '#c44d1a',
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          300: '#6ee7b7',
+          400: '#34d399',
+          500: '#10b981',
+          DEFAULT: '#059669',
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+          900: '#064e3b',
         },
         secondary: {
-          DEFAULT: '#87cc6e',
-          light: '#a3d98f',
-          dark: '#6ab554',
+          DEFAULT: '#f59e0b',
+          light: '#fbbf24',
+          dark: '#d97706',
         },
+      },
+      fontFamily: {
+        sans: ['DM Sans', 'Nunito', 'system-ui', 'sans-serif'],
       },
     },
   },

@@ -1,0 +1,69 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { SelectModule } from 'primeng/select';
+import { TextareaModule } from 'primeng/textarea';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+
+import { PedidoService } from '../../core/services/pedido.service';
+import { ClienteService } from '../../core/services/cliente.service';
+import { MarkupService } from '../../core/services/markup.service';
+import { Cliente, Markup } from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+
+@Component({
+  selector: 'app-pedido-form',
+  standalone: true,
+  imports: [
+    CommonModule, ReactiveFormsModule, ButtonModule, SelectModule,
+    TextareaModule, ToastModule, PageHeaderComponent,
+  ],
+  providers: [MessageService],
+  templateUrl: './pedido-form.component.html',
+})
+export class PedidoFormComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private pedidoService = inject(PedidoService);
+  private clienteService = inject(ClienteService);
+  private markupService = inject(MarkupService);
+  private router = inject(Router);
+  private messageService = inject(MessageService);
+
+  form!: FormGroup;
+  clientes: Cliente[] = [];
+  markups: Markup[] = [];
+  salvando = false;
+
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      cliente_id: [null, Validators.required],
+      markup_id: [null],
+      observacoes: [''],
+    });
+
+    this.clienteService.listar().subscribe({ next: (data) => this.clientes = data });
+    this.markupService.listar().subscribe({ next: (data) => this.markups = data });
+  }
+
+  salvar(): void {
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    this.salvando = true;
+
+    this.pedidoService.criar(this.form.value).subscribe({
+      next: (pedido) => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: `Pedido ${pedido.numero} criado` });
+        setTimeout(() => this.router.navigate(['/pedidos', pedido.id]), 1000);
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao criar pedido' });
+        this.salvando = false;
+      },
+    });
+  }
+
+  voltar(): void { this.router.navigate(['/pedidos']); }
+  isInvalid(campo: string): boolean { const c = this.form.get(campo); return !!(c?.invalid && c?.touched); }
+}

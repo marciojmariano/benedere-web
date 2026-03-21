@@ -1,123 +1,111 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
+import { SelectModule } from 'primeng/select';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TextareaModule } from 'primeng/textarea';
 
 import { PedidoService } from '../../core/services/pedido.service';
-import { Pedido, StatusPedido, STATUS_PEDIDO_LABELS, STATUS_PEDIDO_SEVERITY } from '../../core/models';
+import { ProdutoService } from '../../core/services/produto.service';
+import { IngredienteService } from '../../core/services/ingrediente.service';
+import {
+  Pedido, PedidoItem, StatusPedido, TipoItem, TipoRefeicao,
+  TIPO_REFEICAO_LABELS, Produto, Ingrediente,
+} from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { StatusTimelineComponent } from '../../shared/components/status-timeline.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
+import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
+
+interface ComposicaoTemp {
+  ingrediente_id: string;
+  ingrediente_nome: string;
+  quantidade_g: number;
+  custo_unitario: number;
+}
 
 @Component({
   selector: 'app-pedido-detail',
   standalone: true,
-  imports: [CommonModule, ButtonModule, TagModule, ToastModule],
-  providers: [MessageService],
-  template: `
-    <div>
-      <p-toast />
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-2xl font-bold text-gray-800">Pedido {{ pedido?.numero }}</h2>
-          <p class="text-gray-500 text-sm mt-1">Detalhes do pedido</p>
-        </div>
-        <p-button label="Voltar" icon="pi pi-arrow-left" [outlined]="true" (onClick)="voltar()" />
-      </div>
-
-      @if (pedido) {
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <span class="text-gray-500 text-sm">Status</span>
-              <div class="mt-1"><p-tag [value]="getStatusLabel(pedido.status)" [severity]="getStatusSeverity(pedido.status)" /></div>
-            </div>
-            <div>
-              <span class="text-gray-500 text-sm">Valor Total</span>
-              <div class="text-lg font-bold text-gray-800 mt-1">R$ {{ pedido.valor_total }}</div>
-            </div>
-            <div>
-              <span class="text-gray-500 text-sm">Itens</span>
-              <div class="text-lg font-bold text-gray-800 mt-1">{{ pedido.itens?.length || 0 }}</div>
-            </div>
-            <div>
-              <span class="text-gray-500 text-sm">Data</span>
-              <div class="text-gray-800 mt-1">{{ pedido.created_at | date:'dd/MM/yyyy HH:mm' }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Itens -->
-        @for (item of pedido.itens; track item.id) {
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-3">
-            <div class="flex justify-between items-center mb-2">
-              <div>
-                <span class="font-semibold text-gray-800">{{ item.nome_snapshot }}</span>
-                <span class="text-gray-400 text-sm ml-2">({{ item.tipo }})</span>
-              </div>
-              <div class="text-right">
-                <div class="text-sm text-gray-500">{{ item.quantidade }}x · R$ {{ item.preco_unitario }}</div>
-                <div class="font-bold text-gray-800">R$ {{ item.preco_total }}</div>
-              </div>
-            </div>
-            @if (item.composicao?.length) {
-              <div class="mt-2 pl-4 border-l-2 border-gray-200">
-                @for (c of item.composicao; track c.id) {
-                  <div class="text-sm text-gray-600 py-1">
-                    {{ c.ingrediente_nome_snap }} · {{ c.quantidade_g }}g
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        }
-
-        <!-- Ações de status -->
-        @if (pedido.status === 'rascunho') {
-          <div class="flex gap-3 mt-4">
-            <p-button label="Aprovar" icon="pi pi-check" (onClick)="mudarStatus('aprovado')" />
-            <p-button label="Cancelar" icon="pi pi-times" severity="danger" [outlined]="true" (onClick)="mudarStatus('cancelado')" />
-          </div>
-        }
-        @if (pedido.status === 'aprovado') {
-          <div class="flex gap-3 mt-4">
-            <p-button label="Iniciar Produção" icon="pi pi-cog" (onClick)="mudarStatus('em_producao')" />
-            <p-button label="Cancelar" icon="pi pi-times" severity="danger" [outlined]="true" (onClick)="mudarStatus('cancelado')" />
-          </div>
-        }
-        @if (pedido.status === 'em_producao') {
-          <div class="flex gap-3 mt-4">
-            <p-button label="Marcar Entregue" icon="pi pi-truck" (onClick)="mudarStatus('entregue')" />
-            <p-button label="Cancelar" icon="pi pi-times" severity="danger" [outlined]="true" (onClick)="mudarStatus('cancelado')" />
-          </div>
-        }
-      }
-    </div>
-  `,
+  imports: [
+    CommonModule, FormsModule, ButtonModule, ToastModule,
+    DialogModule, SelectModule, InputTextModule, InputNumberModule,
+    ConfirmDialogModule, TextareaModule,
+    PageHeaderComponent, StatusTimelineComponent, StatusBadgeComponent, CurrencyBrlPipe,
+  ],
+  providers: [MessageService, ConfirmationService],
+  templateUrl: './pedido-detail.component.html',
 })
 export class PedidoDetailComponent implements OnInit {
   private service = inject(PedidoService);
+  private produtoService = inject(ProdutoService);
+  private ingredienteService = inject(IngredienteService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
 
   pedido: Pedido | null = null;
   loading = false;
 
+  // Dialog adicionar item
+  showItemDialog = false;
+  itemTipo: TipoItem = TipoItem.SERIE;
+  produtos: Produto[] = [];
+  ingredientes: Ingrediente[] = [];
+
+  // Item série
+  produtoSelecionadoId: string | null = null;
+  serieQuantidade = 1;
+  serieTipoRefeicao: TipoRefeicao | null = null;
+
+  // Item personalizado
+  persNome = '';
+  persQuantidade = 1;
+  persTipoRefeicao: TipoRefeicao | null = null;
+  persComposicao: ComposicaoTemp[] = [];
+  novoIngredienteId: string | null = null;
+  novoIngredienteQtd = 0;
+
+  // Cancelamento
+  showCancelDialog = false;
+  motivoCancelamento = '';
+
+  tiposRefeicao = Object.values(TipoRefeicao).map(v => ({ label: TIPO_REFEICAO_LABELS[v], value: v }));
+  tiposItem = [
+    { label: 'Produto de Série', value: TipoItem.SERIE },
+    { label: 'Personalizado', value: TipoItem.PERSONALIZADO },
+  ];
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) { this.voltar(); return; }
+    this.carregarPedido(id);
+    this.produtoService.listar().subscribe({ next: (d) => this.produtos = d });
+    this.ingredienteService.listar().subscribe({ next: (d) => this.ingredientes = d });
+  }
+
+  carregarPedido(id: string): void {
     this.loading = true;
     this.service.buscarPorId(id).subscribe({
-      next: (data: Pedido) => { this.pedido = data; this.loading = false; },
+      next: (data) => { this.pedido = data; this.loading = false; },
       error: () => { this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Pedido não encontrado' }); this.voltar(); },
     });
   }
 
-  mudarStatus(status: string): void {
+  // ── Status ──────────────────────────────────────────────────────────────
+
+  mudarStatus(status: StatusPedido): void {
     if (!this.pedido) return;
-    this.service.mudarStatus(this.pedido.id, status as StatusPedido).subscribe({
-      next: (data: Pedido) => {
+    this.service.mudarStatus(this.pedido.id, status).subscribe({
+      next: (data) => {
         this.pedido = data;
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Status atualizado' });
       },
@@ -125,9 +113,151 @@ export class PedidoDetailComponent implements OnInit {
     });
   }
 
+  abrirCancelDialog(): void {
+    this.motivoCancelamento = '';
+    this.showCancelDialog = true;
+  }
+
+  confirmarCancelamento(): void {
+    this.showCancelDialog = false;
+    this.mudarStatus(StatusPedido.CANCELADO);
+  }
+
+  get isRascunho(): boolean { return this.pedido?.status === StatusPedido.RASCUNHO; }
+  get isFinalizado(): boolean {
+    return this.pedido?.status === StatusPedido.ENTREGUE || this.pedido?.status === StatusPedido.CANCELADO;
+  }
+
+  // ── Dialog adicionar item ───────────────────────────────────────────────
+
+  abrirDialogItem(): void {
+    this.itemTipo = TipoItem.SERIE;
+    this.produtoSelecionadoId = null;
+    this.serieQuantidade = 1;
+    this.serieTipoRefeicao = null;
+    this.persNome = '';
+    this.persQuantidade = 1;
+    this.persTipoRefeicao = null;
+    this.persComposicao = [];
+    this.showItemDialog = true;
+  }
+
+  // ── Item série ──────────────────────────────────────────────────────────
+
+  adicionarItemSerie(): void {
+    if (!this.pedido || !this.produtoSelecionadoId) return;
+    const item: any = {
+      tipo: TipoItem.SERIE,
+      produto_id: this.produtoSelecionadoId,
+      quantidade: this.serieQuantidade,
+    };
+    if (this.serieTipoRefeicao) item.tipo_refeicao = this.serieTipoRefeicao;
+
+    this.service.adicionarItem(this.pedido.id, item).subscribe({
+      next: (data) => {
+        this.pedido = data;
+        this.showItemDialog = false;
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Item adicionado' });
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao adicionar item' }),
+    });
+  }
+
+  // ── Item personalizado ──────────────────────────────────────────────────
+
+  adicionarIngredienteTemp(): void {
+    if (!this.novoIngredienteId || this.novoIngredienteQtd <= 0) return;
+    const ing = this.ingredientes.find(i => i.id === this.novoIngredienteId);
+    if (!ing) return;
+    // Prevent duplicates
+    if (this.persComposicao.some(c => c.ingrediente_id === ing.id)) return;
+
+    this.persComposicao.push({
+      ingrediente_id: ing.id,
+      ingrediente_nome: ing.nome,
+      quantidade_g: this.novoIngredienteQtd,
+      custo_unitario: +ing.custo_unitario,
+    });
+    this.novoIngredienteId = null;
+    this.novoIngredienteQtd = 0;
+  }
+
+  removerIngredienteTemp(index: number): void {
+    this.persComposicao.splice(index, 1);
+  }
+
+  get ingredientesDisponiveis(): Ingrediente[] {
+    const usados = new Set(this.persComposicao.map(c => c.ingrediente_id));
+    return this.ingredientes.filter(i => !usados.has(i.id));
+  }
+
+  get persCustoTotal(): number {
+    return this.persComposicao.reduce((acc, c) => acc + (c.quantidade_g / 1000) * c.custo_unitario, 0);
+  }
+
+  get persPesoTotal(): number {
+    return this.persComposicao.reduce((acc, c) => acc + c.quantidade_g, 0);
+  }
+
+  adicionarItemPersonalizado(): void {
+    if (!this.pedido || !this.persNome || this.persComposicao.length === 0) return;
+
+    const item: any = {
+      tipo: TipoItem.PERSONALIZADO,
+      nome: this.persNome,
+      quantidade: this.persQuantidade,
+      tipo_refeicao: this.persTipoRefeicao,
+      composicao: this.persComposicao.map(c => ({
+        ingrediente_id: c.ingrediente_id,
+        quantidade_g: c.quantidade_g,
+      })),
+    };
+
+    this.service.adicionarItem(this.pedido.id, item).subscribe({
+      next: (data) => {
+        this.pedido = data;
+        this.showItemDialog = false;
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Item personalizado adicionado' });
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao adicionar item' }),
+    });
+  }
+
+  adicionarItem(): void {
+    if (this.itemTipo === TipoItem.SERIE) {
+      this.adicionarItemSerie();
+    } else {
+      this.adicionarItemPersonalizado();
+    }
+  }
+
+  // ── Remover item ────────────────────────────────────────────────────────
+
+  confirmarRemoverItem(item: PedidoItem): void {
+    this.confirmationService.confirm({
+      message: `Remover "${item.nome_snapshot}" do pedido?`,
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        if (!this.pedido) return;
+        this.service.removerItem(this.pedido.id, item.id).subscribe({
+          next: (data) => {
+            this.pedido = data;
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Item removido' });
+          },
+          error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao remover item' }),
+        });
+      },
+    });
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+
   voltar(): void { this.router.navigate(['/pedidos']); }
-  getStatusLabel(status: StatusPedido): string { return STATUS_PEDIDO_LABELS[status] || status; }
-  getStatusSeverity(status: StatusPedido): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
-  return (STATUS_PEDIDO_SEVERITY[status] as any) || 'secondary';
-}
+  getTipoRefeicaoLabel(tipo: TipoRefeicao | null): string { return tipo ? TIPO_REFEICAO_LABELS[tipo] : '—'; }
+
+  formatDate(date: string | null): string {
+    if (!date) return '—';
+    return new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
 }

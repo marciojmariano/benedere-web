@@ -110,11 +110,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/markups/indice-markup-form.component').then((m) => m.IndiceMarkupFormComponent),
       },
-      // ── Pedidos (rotas mantidas — serão atualizadas no Épico 2 Frontend) ─
+      // ── Pedidos ────────────────────────────────────────────────────────
       {
         path: 'pedidos',
         loadComponent: () =>
           import('./features/pedidos/pedidos-list.component').then((m) => m.PedidosListComponent),
+      },
+      {
+        path: 'pedidos/novo',
+        loadComponent: () =>
+          import('./features/pedidos/pedido-form.component').then((m) => m.PedidoFormComponent),
       },
       {
         path: 'pedidos/:id',

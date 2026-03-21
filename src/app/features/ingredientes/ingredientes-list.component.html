@@ -2,42 +2,72 @@
   <p-toast />
   <p-confirmDialog />
 
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800">Ingredientes</h2>
-      <p class="text-gray-500 text-sm mt-1">Gerencie os ingredientes cadastrados</p>
-    </div>
+  <app-page-header title="Ingredientes" subtitle="Gerencie os ingredientes cadastrados">
     <p-button label="Novo Ingrediente" icon="pi pi-plus" (onClick)="novo()" />
-  </div>
+  </app-page-header>
 
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-    <p-table [value]="ingredientes" [loading]="loading" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+  <div class="bg-white rounded-2xl shadow-sm border border-zinc-100">
+    <p-table #dt [value]="ingredientes" [loading]="loading" [paginator]="true" [rows]="10"
+             [globalFilterFields]="['nome']" styleClass="p-datatable-sm">
+      <ng-template pTemplate="caption">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-zinc-400">{{ ingredientes.length }} ingrediente(s)</span>
+          <div class="relative">
+            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
+            <input pInputText type="text" placeholder="Buscar ingrediente..." class="w-64 pl-9"
+                   (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
+          </div>
+        </div>
+      </ng-template>
       <ng-template pTemplate="header">
         <tr>
-          <th>Nome</th>
+          <th pSortableColumn="nome">Nome <p-sortIcon field="nome" /></th>
           <th>Unidade</th>
-          <th>Custo Unitário</th>
+          <th pSortableColumn="custo_unitario">Custo Unitário <p-sortIcon field="custo_unitario" /></th>
           <th>Status</th>
           <th style="width: 120px">Ações</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-i>
-        <tr>
-          <td class="font-medium">{{ i.nome }}</td>
-          <td>{{ i.unidade_medida }}</td>
-          <td>R$ {{ i.custo_unitario }}</td>
-          <td><p-tag [value]="i.ativo ? 'Ativo' : 'Inativo'" [severity]="i.ativo ? 'success' : 'danger'" /></td>
+        <tr class="group cursor-pointer hover:bg-zinc-50/50 transition-colors" (click)="abrirDetalhe(i)">
+          <td class="font-medium text-zinc-800">{{ i.nome }}</td>
           <td>
-            <div class="flex gap-2">
-              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="editar(i)" />
-              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="confirmarDesativar(i)" />
+            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-600 uppercase">
+              {{ i.unidade_medida }}
+            </span>
+          </td>
+          <td class="font-medium text-emerald-600">{{ i.custo_unitario | currencyBrl }}</td>
+          <td><app-status-badge [status]="i.ativo ? 'ativo' : 'inativo'" /></td>
+          <td>
+            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" (click)="$event.stopPropagation()">
+              <button class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                      (click)="editar(i)" title="Editar">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button class="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      (click)="confirmarDesativar(i)" title="Desativar">
+                <i class="pi pi-trash"></i>
+              </button>
             </div>
           </td>
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
-        <tr><td colspan="5" class="text-center text-gray-400 py-8">Nenhum ingrediente encontrado</td></tr>
+        <tr>
+          <td colspan="5" class="text-center py-12">
+            <i class="pi pi-box text-4xl text-zinc-300 mb-3"></i>
+            <p class="text-zinc-400 font-medium">Nenhum ingrediente encontrado</p>
+          </td>
+        </tr>
       </ng-template>
     </p-table>
   </div>
+
+  <!-- Drawer de detalhes -->
+  <app-ingrediente-detail-drawer
+    [visible]="drawerVisible()"
+    [ingrediente]="ingredienteSelecionado()"
+    (visibleChange)="drawerVisible.set($event)"
+    (editar)="editar($event); drawerVisible.set(false)"
+  />
 </div>

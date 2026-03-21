@@ -1,0 +1,48 @@
+<div>
+  <p-toast />
+
+  <app-page-header title="Novo Pedido" subtitle="Crie um novo pedido de venda">
+    <p-button label="Voltar" icon="pi pi-arrow-left" [outlined]="true" severity="secondary" (onClick)="voltar()" />
+  </app-page-header>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <div class="bg-white rounded-2xl shadow-sm border border-zinc-100 p-6 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Cliente *</label>
+          <p-select formControlName="cliente_id" [options]="clientes"
+                    optionLabel="nome" optionValue="id" placeholder="Selecione o cliente..."
+                    [filter]="true" filterPlaceholder="Buscar cliente..." />
+          @if (isInvalid('cliente_id')) {
+            <small class="text-rose-500 text-xs">Cliente é obrigatório</small>
+          }
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Markup (opcional)</label>
+          <p-select formControlName="markup_id" [options]="markups"
+                    optionLabel="nome" optionValue="id" placeholder="Herdar do cliente/tenant"
+                    [showClear]="true" />
+          <small class="text-zinc-300 text-xs">Se não informado, herda do cliente ou tenant</small>
+        </div>
+
+        <div class="md:col-span-2 flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Observações</label>
+          <textarea pTextarea formControlName="observacoes" rows="3" placeholder="Observações opcionais"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+      <div class="flex items-center gap-2 text-amber-700">
+        <i class="pi pi-info-circle"></i>
+        <span class="text-sm">O pedido será criado como <strong>rascunho</strong>. Após criar, você poderá adicionar itens.</span>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <p-button label="Cancelar" [outlined]="true" severity="secondary" (onClick)="voltar()" />
+      <p-button label="Criar Pedido" icon="pi pi-check" type="submit" [loading]="salvando" />
+    </div>
+  </form>
+</div>

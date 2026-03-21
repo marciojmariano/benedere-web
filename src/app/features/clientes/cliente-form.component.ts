@@ -5,24 +5,25 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
+import { TabsModule } from 'primeng/tabs';
 import { MessageService } from 'primeng/api';
 import { MarkupService } from '../../core/services/markup.service';
 import { Markup } from '../../core/models';
 import { ClienteService } from '../../core/services/cliente.service';
 import { NutricionistaService } from '../../core/services/nutricionista.service';
 import { Nutricionista } from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { AvatarComponent } from '../../shared/components/avatar.component';
 
 @Component({
   selector: 'app-cliente-form',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    ButtonModule,
-    InputTextModule,
-    SelectModule,
-    ToastModule,
+    CommonModule, ReactiveFormsModule,
+    ButtonModule, InputTextModule, SelectModule, TextareaModule, ToastModule, TabsModule,
+    PageHeaderComponent, AvatarComponent,
   ],
   providers: [MessageService],
   templateUrl: './cliente-form.component.html',

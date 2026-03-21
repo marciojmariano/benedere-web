@@ -1,0 +1,105 @@
+<div>
+  <p-toast />
+
+  <app-page-header title="Pedidos" subtitle="Gerencie os pedidos de venda">
+    <p-button label="Novo Pedido" icon="pi pi-plus" (onClick)="novo()" />
+  </app-page-header>
+
+  <!-- KPI Summary -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+    <div class="bg-white rounded-xl border border-zinc-100 px-4 py-3">
+      <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Total</p>
+      <p class="text-xl font-bold text-zinc-800">{{ totalPedidos }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-zinc-100 px-4 py-3">
+      <p class="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Pendentes</p>
+      <p class="text-xl font-bold text-zinc-800">{{ pedidosPendentes }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-zinc-100 px-4 py-3">
+      <p class="text-[10px] font-semibold text-violet-500 uppercase tracking-wide">Em Produção</p>
+      <p class="text-xl font-bold text-zinc-800">{{ pedidosEmProducao }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-zinc-100 px-4 py-3">
+      <p class="text-[10px] font-semibold text-emerald-500 uppercase tracking-wide">Entregues</p>
+      <p class="text-xl font-bold text-zinc-800">{{ pedidosEntregues }}</p>
+    </div>
+  </div>
+
+  <!-- Status filter chips -->
+  <div class="flex flex-wrap gap-2 mb-4">
+    @for (status of statusOptions; track status) {
+      <button
+        class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors border"
+        [class]="statusFiltro === status
+          ? 'bg-emerald-500 text-white border-emerald-500'
+          : 'bg-white text-zinc-600 border-zinc-200 hover:border-emerald-300 hover:text-emerald-600'"
+        (click)="toggleStatus(status)"
+      >
+        {{ statusLabels[status] }}
+      </button>
+    }
+    @if (statusFiltro) {
+      <button
+        class="px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-zinc-600 transition-colors"
+        (click)="statusFiltro = null; carregar()"
+      >
+        <i class="pi pi-times text-xs mr-1"></i> Limpar
+      </button>
+    }
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-zinc-100">
+    <p-table #dt [value]="pedidos" [loading]="loading" [paginator]="true" [rows]="10"
+             [globalFilterFields]="['numero']" styleClass="p-datatable-sm">
+      <ng-template pTemplate="caption">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-zinc-400">{{ pedidos.length }} pedido(s)</span>
+          <div class="relative">
+            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
+            <input pInputText type="text" placeholder="Buscar por número..." class="w-56 pl-9"
+                   (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="numero">Número <p-sortIcon field="numero" /></th>
+          <th>Status</th>
+          <th pSortableColumn="valor_total">Valor Total <p-sortIcon field="valor_total" /></th>
+          <th>Itens</th>
+          <th pSortableColumn="created_at">Data <p-sortIcon field="created_at" /></th>
+          <th style="width: 80px"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-p>
+        <tr class="group cursor-pointer hover:bg-zinc-50/50" (click)="ver(p)">
+          <td class="font-semibold text-zinc-800">{{ p.numero }}</td>
+          <td><app-status-badge [status]="p.status" /></td>
+          <td class="font-medium text-zinc-700">{{ p.valor_total | currencyBrl }}</td>
+          <td class="text-zinc-600">{{ p.total_itens }}</td>
+          <td class="text-zinc-500 text-sm">{{ formatDate(p.created_at) }}</td>
+          <td>
+            <button
+              class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors opacity-0 group-hover:opacity-100"
+              (click)="ver(p); $event.stopPropagation()"
+              title="Ver detalhes"
+            >
+              <i class="pi pi-eye"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center py-12">
+            <div class="text-zinc-300">
+              <i class="pi pi-shopping-cart text-4xl mb-3"></i>
+              <p class="text-zinc-400 font-medium">Nenhum pedido encontrado</p>
+              <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro pedido clicando em "Novo Pedido"</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

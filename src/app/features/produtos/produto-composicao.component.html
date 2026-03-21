@@ -1,0 +1,102 @@
+<div>
+  <div class="flex items-center justify-between mb-4">
+    <p class="text-sm text-zinc-400">Monte a receita adicionando ingredientes e quantidades. Arraste para reordenar.</p>
+    <button type="button"
+      class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+      (click)="addItem()"
+    >
+      <i class="pi pi-plus text-xs"></i> Adicionar Ingrediente
+    </button>
+  </div>
+
+  @if (composicaoForm.length === 0) {
+    <div class="text-center py-12 border-2 border-dashed border-zinc-200 rounded-xl">
+      <i class="pi pi-box text-4xl text-zinc-300 mb-3"></i>
+      <p class="text-zinc-400 font-medium">Nenhum ingrediente adicionado</p>
+      <p class="text-zinc-300 text-sm mt-1">Clique em "Adicionar Ingrediente" para montar a receita</p>
+    </div>
+  }
+
+  <!-- Header row -->
+  @if (composicaoForm.length > 0) {
+    <div class="flex items-center gap-3 px-3 py-2 mb-1">
+      <span class="w-8 shrink-0"></span>
+      <span class="flex-1 text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Ingrediente</span>
+      <span class="w-32 shrink-0 text-[10px] font-semibold text-zinc-400 uppercase tracking-wide text-center">Quantidade</span>
+      <span class="w-28 shrink-0 text-[10px] font-semibold text-zinc-400 uppercase tracking-wide text-right">Custo</span>
+      <span class="w-8 shrink-0"></span>
+    </div>
+  }
+
+  <!-- Drag-drop list -->
+  <div cdkDropList class="drag-list flex flex-col gap-2" (cdkDropListDropped)="onDrop($event)">
+    @for (item of composicaoForm.controls; track item; let i = $index) {
+      <div cdkDrag class="drag-item flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-100 hover:border-emerald-200 transition-colors"
+           [formGroup]="$any(item)">
+
+        <!-- Drag handle -->
+        <div cdkDragHandle class="cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-500 shrink-0">
+          <i class="pi pi-ellipsis-v text-xs"></i>
+          <i class="pi pi-ellipsis-v text-xs -ml-1.5"></i>
+        </div>
+
+        <!-- Ingrediente -->
+        <div class="flex-1 min-w-0">
+          <p-select formControlName="ingrediente_id"
+                    [options]="ingredientesDisponiveis(item.value.ingrediente_id)"
+                    optionLabel="nome" optionValue="id"
+                    placeholder="Selecione o ingrediente..."
+                    [filter]="true" filterPlaceholder="Buscar..."
+                    class="w-full"
+                    (onChange)="onFieldChange()" />
+        </div>
+
+        <!-- Quantidade -->
+        <div class="w-32 shrink-0">
+          <p-inputNumber formControlName="quantidade_g" suffix=" g" [min]="0.01"
+                         [maxFractionDigits]="2" placeholder="Qtd (g)" class="w-full"
+                         (onInput)="onFieldChange()" />
+        </div>
+
+        <!-- Custo calculado -->
+        <div class="w-28 text-right shrink-0">
+          @if (item.value.ingrediente_id && item.value.quantidade_g) {
+            <span class="text-sm font-semibold text-emerald-600">
+              {{ calcularCustoItem(item.value.ingrediente_id, item.value.quantidade_g) | currencyBrl }}
+            </span>
+          } @else {
+            <span class="text-zinc-300 text-sm">R$ —</span>
+          }
+        </div>
+
+        <!-- Remove -->
+        <button type="button"
+          class="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0"
+          (click)="removeItem(i)"
+        >
+          <i class="pi pi-trash text-sm"></i>
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Totais -->
+  @if (composicaoForm.length > 0) {
+    <div class="mt-4 pt-4 border-t border-zinc-100">
+      <div class="flex justify-end gap-8">
+        <div class="text-right">
+          <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Ingredientes</p>
+          <p class="text-lg font-bold text-zinc-700">{{ composicaoForm.length }}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Peso Total</p>
+          <p class="text-lg font-bold text-zinc-700">{{ pesoTotal | number:'1.0-2' }}g</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Custo Total</p>
+          <p class="text-lg font-bold text-emerald-600">{{ custoTotal | currencyBrl }}</p>
+        </div>
+      </div>
+    </div>
+  }
+</div>

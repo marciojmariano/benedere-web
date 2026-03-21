@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -8,19 +8,20 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { DividerModule } from 'primeng/divider';
 
-import { ProdutoService, ProdutoComposicaoCreate } from '../../core/services/produto.service';
+import { ProdutoService } from '../../core/services/produto.service';
 import { IngredienteService } from '../../core/services/ingrediente.service';
 import { Ingrediente, TipoRefeicao, TIPO_REFEICAO_LABELS } from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { ProdutoComposicaoComponent, ComposicaoItem } from './produto-composicao.component';
 
 @Component({
   selector: 'app-produto-form',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule,
-    SelectModule, TextareaModule, ToastModule, InputNumberModule, DividerModule,
+    SelectModule, TextareaModule, ToastModule,
+    PageHeaderComponent, ProdutoComposicaoComponent,
   ],
   providers: [MessageService],
   templateUrl: './produto-form.component.html',
@@ -33,11 +34,16 @@ export class ProdutoFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private messageService = inject(MessageService);
 
+  @ViewChild(ProdutoComposicaoComponent) composicaoComp?: ProdutoComposicaoComponent;
+
   form!: FormGroup;
   ingredientes: Ingrediente[] = [];
+  composicaoInicial: ComposicaoItem[] = [];
+  composicaoAtual: ComposicaoItem[] = [];
   salvando = false;
   produtoId: string | null = null;
   isEdicao = false;
+  activeTab = 0;
 
   tiposRefeicao = Object.values(TipoRefeicao).map(v => ({
     label: TIPO_REFEICAO_LABELS[v],
@@ -52,7 +58,6 @@ export class ProdutoFormComponent implements OnInit {
       nome: ['', [Validators.required, Validators.minLength(2)]],
       tipo_refeicao: [null],
       descricao: [''],
-      composicao: this.fb.array([]),
     });
 
     this.ingredienteService.listar().subscribe({
@@ -67,9 +72,12 @@ export class ProdutoFormComponent implements OnInit {
             tipo_refeicao: data.tipo_refeicao,
             descricao: data.descricao,
           });
-          // Carrega composição existente
           if (data.composicao?.length) {
-            data.composicao.forEach(c => this.adicionarIngrediente(c.ingrediente_id, +c.quantidade_g, c.ordem));
+            this.composicaoInicial = data.composicao.map(c => ({
+              ingrediente_id: c.ingrediente_id,
+              quantidade_g: +c.quantidade_g,
+              ordem: c.ordem,
+            }));
           }
         },
         error: () => this.voltar(),
@@ -77,48 +85,8 @@ export class ProdutoFormComponent implements OnInit {
     }
   }
 
-  // ── Composição (FormArray) ──────────────────────────────────────────────
-
-  get composicaoArray(): FormArray {
-    return this.form.get('composicao') as FormArray;
-  }
-
-  adicionarIngrediente(ingredienteId: string = '', quantidadeG: number = 0, ordem: number = -1): void {
-    const idx = ordem >= 0 ? ordem : this.composicaoArray.length;
-    this.composicaoArray.push(this.fb.group({
-      ingrediente_id: [ingredienteId, Validators.required],
-      quantidade_g: [quantidadeG, [Validators.required, Validators.min(0.01)]],
-      ordem: [idx],
-    }));
-  }
-
-  removerIngrediente(index: number): void {
-    this.composicaoArray.removeAt(index);
-    // Reordenar
-    this.composicaoArray.controls.forEach((c, i) => c.patchValue({ ordem: i }));
-  }
-
-  getIngredienteNome(ingredienteId: string): string {
-    return this.ingredientes.find(i => i.id === ingredienteId)?.nome ?? '';
-  }
-
-  getIngredienteCusto(ingredienteId: string): number {
-    return +(this.ingredientes.find(i => i.id === ingredienteId)?.custo_unitario ?? 0);
-  }
-
-  calcularCustoItem(ingredienteId: string, quantidadeG: number): number {
-    const custoPorKg = this.getIngredienteCusto(ingredienteId);
-    return (quantidadeG / 1000) * custoPorKg;
-  }
-
-  get pesoTotal(): number {
-    return this.composicaoArray.controls.reduce((acc, c) => acc + (+c.value.quantidade_g || 0), 0);
-  }
-
-  get custoTotal(): number {
-    return this.composicaoArray.controls.reduce((acc, c) => {
-      return acc + this.calcularCustoItem(c.value.ingrediente_id, +c.value.quantidade_g || 0);
-    }, 0);
+  onComposicaoChange(items: ComposicaoItem[]): void {
+    this.composicaoAtual = items;
   }
 
   // ── Salvar ─────────────────────────────────────────────────────────────
@@ -127,13 +95,12 @@ export class ProdutoFormComponent implements OnInit {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.salvando = true;
 
+    const composicao = this.composicaoAtual.length ? this.composicaoAtual : [];
+
     if (this.isEdicao && this.produtoId) {
-      // Atualiza dados básicos
-      const { composicao, ...dados } = this.form.value;
-      this.service.atualizar(this.produtoId, dados).subscribe({
+      this.service.atualizar(this.produtoId, this.form.value).subscribe({
         next: () => {
-          // Depois salva composição
-          if (composicao?.length) {
+          if (composicao.length) {
             this.service.substituirComposicao(this.produtoId!, composicao).subscribe({
               next: () => this.sucessoESair(),
               error: () => this.erroAoSalvar(),
@@ -145,8 +112,8 @@ export class ProdutoFormComponent implements OnInit {
         error: () => this.erroAoSalvar(),
       });
     } else {
-      // Criação com composição junto
-      this.service.criar(this.form.value).subscribe({
+      const payload = { ...this.form.value, composicao };
+      this.service.criar(payload).subscribe({
         next: () => this.sucessoESair(),
         error: () => this.erroAoSalvar(),
       });

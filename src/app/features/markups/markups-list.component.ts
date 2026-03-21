@@ -3,18 +3,23 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { MarkupService } from '../../core/services/markup.service';
 import { Markup } from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
+import { GaugeMarkupComponent } from '../../shared/components/gauge-markup.component';
 
 @Component({
   selector: 'app-markups-list',
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TagModule, ToastModule, ConfirmDialogModule],
+  imports: [
+    CommonModule, TableModule, ButtonModule, ToastModule, ConfirmDialogModule,
+    PageHeaderComponent, StatusBadgeComponent, GaugeMarkupComponent,
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './markups-list.component.html',
 })
@@ -39,6 +44,12 @@ export class MarkupsListComponent implements OnInit {
 
   novo(): void { this.router.navigate(['/markups/novo']); }
   editar(m: Markup): void { this.router.navigate(['/markups', m.id]); }
+
+  getMarkupPercentage(fator: string): number {
+    const f = +fator;
+    if (f <= 0) return 0;
+    return ((f - 1) / f) * 100;
+  }
 
   confirmarDesativar(m: Markup): void {
     this.confirmationService.confirm({

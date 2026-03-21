@@ -1,20 +1,27 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { IngredienteService } from '../../core/services/ingrediente.service';
 import { Ingrediente } from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
+import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
+import { IngredienteDetailDrawerComponent } from './ingrediente-detail-drawer.component';
 
 @Component({
   selector: 'app-ingredientes-list',
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TagModule, ToastModule, ConfirmDialogModule],
+  imports: [
+    CommonModule, TableModule, ButtonModule, ToastModule, ConfirmDialogModule, InputTextModule,
+    PageHeaderComponent, StatusBadgeComponent, CurrencyBrlPipe, IngredienteDetailDrawerComponent,
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './ingredientes-list.component.html',
 })
@@ -26,6 +33,9 @@ export class IngredientesListComponent implements OnInit {
 
   ingredientes: Ingrediente[] = [];
   loading = false;
+
+  drawerVisible = signal(false);
+  ingredienteSelecionado = signal<Ingrediente | null>(null);
 
   ngOnInit(): void { this.carregar(); }
 
@@ -39,6 +49,11 @@ export class IngredientesListComponent implements OnInit {
 
   novo(): void { this.router.navigate(['/ingredientes/novo']); }
   editar(i: Ingrediente): void { this.router.navigate(['/ingredientes', i.id]); }
+
+  abrirDetalhe(i: Ingrediente): void {
+    this.ingredienteSelecionado.set(i);
+    this.drawerVisible.set(true);
+  }
 
   confirmarDesativar(i: Ingrediente): void {
     this.confirmationService.confirm({

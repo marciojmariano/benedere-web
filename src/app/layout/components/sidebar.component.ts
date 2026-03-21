@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 interface MenuItem {
@@ -13,16 +13,25 @@ interface MenuItem {
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
   styles: [`
+    :host {
+      display: block;
+    }
     .active-link {
-      background-color: #e75d23 !important;
+      background-color: #059669 !important;
       color: white !important;
     }
     .active-link i {
       color: white !important;
     }
+    .sidebar-transition {
+      transition: width 200ms ease-in-out;
+    }
   `],
 })
 export class SidebarComponent {
+  collapsed = input(false);
+  collapsedChange = output<boolean>();
+
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', route: '/' },
     { label: 'Clientes', icon: 'pi pi-users', route: '/clientes' },
@@ -33,4 +42,8 @@ export class SidebarComponent {
     { label: 'Markups', icon: 'pi pi-percentage', route: '/markups' },
     { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/pedidos' },
   ];
+
+  toggleCollapse(): void {
+    this.collapsedChange.emit(!this.collapsed());
+  }
 }

@@ -56,8 +56,4 @@ export class ProdutoService extends ApiService {
     return this.put<Produto>(`/produtos/${produtoId}/composicao`, composicao);
   }
 
-  // PUT não existe no ApiService base — adicionar
-  private put<T>(path: string, body: unknown): Observable<T> {
-    return this.http.put<T>(`${this.baseUrl}${path}`, body);
-  }
 }

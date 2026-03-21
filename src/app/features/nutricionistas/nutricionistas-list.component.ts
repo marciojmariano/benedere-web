@@ -1,20 +1,24 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { NutricionistaService } from '../../core/services/nutricionista.service';
 import { Nutricionista } from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
+import { AvatarComponent } from '../../shared/components/avatar.component';
 
 @Component({
   selector: 'app-nutricionistas-list',
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TagModule, ToastModule, ConfirmDialogModule],
+  imports: [
+    CommonModule, ButtonModule, ToastModule, ConfirmDialogModule,
+    PageHeaderComponent, StatusBadgeComponent, AvatarComponent,
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './nutricionistas-list.component.html',
 })
@@ -27,9 +31,7 @@ export class NutricionistasListComponent implements OnInit {
   nutricionistas: Nutricionista[] = [];
   loading = false;
 
-  ngOnInit(): void {
-    this.carregar();
-  }
+  ngOnInit(): void { this.carregar(); }
 
   carregar(): void {
     this.loading = true;
@@ -48,7 +50,7 @@ export class NutricionistasListComponent implements OnInit {
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: () => this.service.desativar(n.id).subscribe({
-        next: () => { this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Nutricionista desativado' }); this.carregar(); },
+        next: () => { this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Nutricionista desativado(a)' }); this.carregar(); },
         error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao desativar' }),
       }),
     });

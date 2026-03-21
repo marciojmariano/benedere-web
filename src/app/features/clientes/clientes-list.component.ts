@@ -1,10 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -12,19 +10,17 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { ClienteService } from '../../core/services/cliente.service';
 import { Cliente } from '../../core/models';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
+import { AvatarComponent } from '../../shared/components/avatar.component';
 
 @Component({
   selector: 'app-clientes-list',
   standalone: true,
   imports: [
-    CommonModule,
-    // FormsModule,
-    TableModule,
-    ButtonModule,
-    TagModule,
-    ToastModule,
-    ConfirmDialogModule,
-    InputTextModule,
+    CommonModule, TableModule, ButtonModule, ToastModule,
+    ConfirmDialogModule, InputTextModule,
+    PageHeaderComponent, StatusBadgeComponent, AvatarComponent,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clientes-list.component.html',
@@ -37,7 +33,6 @@ export class ClientesListComponent implements OnInit {
 
   clientes: Cliente[] = [];
   loading = false;
-  // filtro = '';
 
   ngOnInit(): void { this.carregar(); }
 

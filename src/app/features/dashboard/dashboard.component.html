@@ -1,0 +1,126 @@
+@if (loading) {
+  <div class="flex items-center justify-center h-64">
+    <i class="pi pi-spin pi-spinner text-3xl text-emerald-500"></i>
+  </div>
+} @else {
+  <div>
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-zinc-800">Dashboard</h1>
+      <p class="text-sm text-zinc-400 mt-0.5">Visão geral do seu negócio</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <app-kpi-card
+        icon="pi pi-users"
+        [value]="totalClientes"
+        label="Clientes Ativos"
+        color="emerald"
+      />
+      <app-kpi-card
+        icon="pi pi-box"
+        [value]="totalIngredientes"
+        label="Ingredientes"
+        color="sky"
+      />
+      <app-kpi-card
+        icon="pi pi-tag"
+        [value]="totalProdutos"
+        label="Produtos"
+        color="violet"
+      />
+      <app-kpi-card
+        icon="pi pi-shopping-cart"
+        [value]="totalPedidosPendentes"
+        label="Pedidos Pendentes"
+        color="amber"
+      />
+    </div>
+
+    <!-- Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Últimos Clientes -->
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
+          <h3 class="text-sm font-semibold text-zinc-700">Últimos Clientes</h3>
+          <button class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                  (click)="navigateTo('/clientes')">
+            Ver todos <i class="pi pi-arrow-right text-[10px] ml-1"></i>
+          </button>
+        </div>
+        <div class="divide-y divide-zinc-50">
+          @for (cliente of ultimosClientes; track cliente.id) {
+            <div class="flex items-center gap-3 px-5 py-3 hover:bg-zinc-50/50 transition-colors">
+              <app-avatar [name]="cliente.nome" size="sm" />
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-zinc-700 truncate">{{ cliente.nome }}</p>
+                <p class="text-xs text-zinc-400 truncate">{{ cliente.email || 'Sem email' }}</p>
+              </div>
+              <app-status-badge [status]="cliente.ativo ? 'ativo' : 'inativo'" />
+            </div>
+          }
+          @if (ultimosClientes.length === 0) {
+            <div class="px-5 py-8 text-center text-zinc-300 text-sm">Nenhum cliente cadastrado</div>
+          }
+        </div>
+      </div>
+
+      <!-- Pedidos Recentes -->
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
+          <h3 class="text-sm font-semibold text-zinc-700">Pedidos Recentes</h3>
+          <button class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                  (click)="navigateTo('/pedidos')">
+            Ver todos <i class="pi pi-arrow-right text-[10px] ml-1"></i>
+          </button>
+        </div>
+        <div class="divide-y divide-zinc-50">
+          @for (pedido of pedidosRecentes; track pedido.id) {
+            <div class="flex items-center gap-3 px-5 py-3 hover:bg-zinc-50/50 transition-colors">
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-zinc-700">{{ pedido.numero }}</p>
+                <p class="text-xs text-zinc-400">{{ formatDate(pedido.created_at) }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-semibold text-zinc-700">{{ pedido.valor_total | currencyBrl }}</p>
+                <app-status-badge [status]="pedido.status" />
+              </div>
+            </div>
+          }
+          @if (pedidosRecentes.length === 0) {
+            <div class="px-5 py-8 text-center text-zinc-300 text-sm">Nenhum pedido cadastrado</div>
+          }
+        </div>
+      </div>
+
+      <!-- Nutricionistas -->
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
+          <h3 class="text-sm font-semibold text-zinc-700">Nutricionistas</h3>
+          <button class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                  (click)="navigateTo('/nutricionistas')">
+            Ver todos <i class="pi pi-arrow-right text-[10px] ml-1"></i>
+          </button>
+        </div>
+        <div class="divide-y divide-zinc-50">
+          @for (nutri of nutricionistas; track nutri.id) {
+            <div class="flex items-center gap-3 px-5 py-3 hover:bg-zinc-50/50 transition-colors">
+              <app-avatar [name]="nutri.nome" size="sm" />
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-zinc-700 truncate">{{ nutri.nome }}</p>
+                <p class="text-xs text-zinc-400">CRN: {{ nutri.crn || '—' }}</p>
+              </div>
+              <app-status-badge [status]="nutri.ativo ? 'ativo' : 'inativo'" />
+            </div>
+          }
+          @if (nutricionistas.length === 0) {
+            <div class="px-5 py-8 text-center text-zinc-300 text-sm">Nenhuma nutricionista cadastrada</div>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+}

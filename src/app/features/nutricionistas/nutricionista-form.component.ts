@@ -5,14 +5,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
+import { TabsModule } from 'primeng/tabs';
 import { MessageService } from 'primeng/api';
 
 import { NutricionistaService } from '../../core/services/nutricionista.service';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { AvatarComponent } from '../../shared/components/avatar.component';
 
 @Component({
   selector: 'app-nutricionista-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule, ToastModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule, ToastModule, TabsModule, PageHeaderComponent, AvatarComponent],
   providers: [MessageService],
   templateUrl: './nutricionista-form.component.html',
 })

@@ -1,41 +1,174 @@
-<div class="max-w-2xl">
+<div>
   <p-toast />
-  <div class="flex items-center gap-3 mb-6">
-    <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" (onClick)="voltar()" />
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800">{{ markupId ? 'Editar Markup' : 'Novo Markup' }}</h2>
-      <p class="text-gray-500 text-sm mt-1">Preencha os dados do markup</p>
-    </div>
-  </div>
 
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-    <form [formGroup]="form" (ngSubmit)="salvar()">
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Nome <span class="text-red-500">*</span></label>
-        <input pInputText formControlName="nome" placeholder="Nome do markup" class="w-full" [class.ng-invalid]="isInvalid('nome')" />
-        @if (isInvalid('nome')) { <small class="text-red-500">Nome é obrigatório</small> }
+  <app-page-header
+    [title]="markupId ? 'Editar Markup' : 'Novo Markup'"
+    subtitle="Configure os índices e visualize o fator de precificação"
+  >
+    <p-button icon="pi pi-arrow-left" label="Voltar" [text]="true" severity="secondary" (onClick)="voltar()" />
+  </app-page-header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Formulário -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+
+        <!-- Header -->
+        <div class="px-6 pt-6 pb-4 border-b border-zinc-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+            <i class="pi pi-percentage text-emerald-600"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-zinc-800">
+              {{ form.get('nome')?.value || 'Novo markup' }}
+            </h3>
+            <p class="text-xs text-zinc-400">
+              Fator: <span class="font-semibold text-emerald-600">{{ fatorCalculado().toFixed(4) }}x</span>
+            </p>
+          </div>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="salvar()">
+          <div class="p-6 space-y-5">
+
+            <div>
+              <label class="block text-sm font-semibold text-zinc-700 mb-1.5">
+                Nome <span class="text-rose-500">*</span>
+              </label>
+              <input pInputText formControlName="nome" placeholder="Ex: Markup Padrão, Markup Premium..."
+                     class="w-full" [class.ng-invalid]="isInvalid('nome')" [class.ng-dirty]="isInvalid('nome')" />
+              @if (isInvalid('nome')) {
+                <small class="text-rose-500 flex items-center gap-1 mt-1">
+                  <i class="pi pi-exclamation-circle text-xs"></i>Nome é obrigatório
+                </small>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-zinc-700 mb-1.5">Descrição</label>
+              <textarea pTextarea formControlName="descricao"
+                        placeholder="Descrição opcional do markup..."
+                        rows="2" class="w-full resize-none"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-zinc-700 mb-1.5">
+                Índices de composição <span class="text-rose-500">*</span>
+              </label>
+              <p-multiselect
+                formControlName="indices_ids"
+                [options]="indices"
+                optionLabel="nome"
+                optionValue="id"
+                placeholder="Selecione os índices que compõem este markup"
+                styleClass="w-full"
+                [showClear]="true"
+              >
+                <ng-template let-idx pTemplate="item">
+                  <div class="flex items-center justify-between w-full gap-4">
+                    <span class="font-medium text-zinc-700">{{ idx.nome }}</span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600">
+                      {{ idx.percentual }}%
+                    </span>
+                  </div>
+                </ng-template>
+              </p-multiselect>
+              @if (isInvalid('indices_ids')) {
+                <small class="text-rose-500 flex items-center gap-1 mt-1">
+                  <i class="pi pi-exclamation-circle text-xs"></i>Selecione pelo menos um índice
+                </small>
+              } @else {
+                <p class="text-xs text-zinc-400 mt-1">
+                  O fator é calculado multiplicando todos os índices selecionados
+                </p>
+              }
+            </div>
+
+            <!-- Índices selecionados com seus percentuais -->
+            @if (indicesSelecionados().length) {
+              <div class="bg-zinc-50 rounded-xl p-4">
+                <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">Composição do fator</p>
+                <div class="space-y-2">
+                  @for (idx of indicesSelecionados(); track idx.id) {
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span class="text-sm text-zinc-700">{{ idx.nome }}</span>
+                      </div>
+                      <span class="text-sm font-semibold text-emerald-600">+ {{ idx.percentual }}%</span>
+                    </div>
+                  }
+                  <div class="pt-2 mt-2 border-t border-zinc-200 flex items-center justify-between">
+                    <span class="text-sm font-semibold text-zinc-700">Fator resultante</span>
+                    <span class="text-base font-bold text-zinc-800">{{ fatorCalculado().toFixed(4) }}x</span>
+                  </div>
+                </div>
+              </div>
+            }
+
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-4 border-t border-zinc-100 flex gap-3 justify-end bg-zinc-50/50">
+            <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="voltar()" />
+            <p-button label="Salvar Markup" icon="pi pi-check" type="submit" [loading]="salvando" />
+          </div>
+        </form>
       </div>
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-        <input pInputText formControlName="descricao" placeholder="Descrição opcional" class="w-full" />
+    </div>
+
+    <!-- Painel lateral: simulador -->
+    <div class="space-y-4">
+
+      <!-- Gauge -->
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5 flex flex-col items-center">
+        <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-4 self-start">Gauge do markup</p>
+        <app-gauge-markup [percentage]="markupPercentage()" size="md" label="Markup" />
+        <div class="mt-4 text-center">
+          <p class="text-2xl font-bold text-zinc-800">{{ fatorCalculado().toFixed(4) }}x</p>
+          <p class="text-xs text-zinc-400">fator de precificação</p>
+        </div>
       </div>
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Índices <span class="text-red-500">*</span></label>
-        <p-multiselect
-          formControlName="indices_ids"
-          [options]="indices"
-          optionLabel="nome"
-          optionValue="id"
-          placeholder="Selecione os índices"
-          styleClass="w-full"
-          [showClear]="true"
-        />
-        @if (isInvalid('indices_ids')) { <small class="text-red-500">Selecione pelo menos um índice</small> }
+
+      <!-- Simulador de preço -->
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5">
+        <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-4">Simulador de preço</p>
+
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-zinc-500 mb-1.5">Custo de referência</label>
+          <p-inputNumber
+            [ngModel]="custoSimulado()"
+            (onInput)="custoSimulado.set($event.value ?? 0)"
+            [ngModelOptions]="{standalone: true}"
+            mode="decimal"
+            locale="pt-BR"
+            [minFractionDigits]="2"
+            [min]="0"
+            styleClass="w-full"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-zinc-500">Custo</span>
+            <span class="font-medium text-zinc-700">{{ custoSimulado() | currencyBrl }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-zinc-500">Fator</span>
+            <span class="font-medium text-zinc-700">× {{ fatorCalculado().toFixed(4) }}</span>
+          </div>
+          <div class="pt-2 border-t border-zinc-100 flex items-center justify-between">
+            <span class="text-sm font-semibold text-zinc-700">Preço de venda</span>
+            <span class="text-lg font-bold text-emerald-600">{{ precoVenda() | currencyBrl }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-zinc-400">Margem</span>
+            <span class="text-xs font-semibold text-zinc-500">{{ markupPercentage().toFixed(1) }}%</span>
+          </div>
+        </div>
       </div>
-      <div class="flex gap-3 justify-end">
-        <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="voltar()" />
-        <p-button label="Salvar" icon="pi pi-check" type="submit" [loading]="salvando" />
-      </div>
-    </form>
+
+    </div>
   </div>
 </div>
