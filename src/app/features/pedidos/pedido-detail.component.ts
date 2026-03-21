@@ -15,13 +15,15 @@ import { TextareaModule } from 'primeng/textarea';
 import { PedidoService } from '../../core/services/pedido.service';
 import { ProdutoService } from '../../core/services/produto.service';
 import { IngredienteService } from '../../core/services/ingrediente.service';
+import { ClienteService } from '../../core/services/cliente.service';
 import {
   Pedido, PedidoItem, StatusPedido, TipoItem, TipoRefeicao,
-  TIPO_REFEICAO_LABELS, Produto, Ingrediente,
+  TIPO_REFEICAO_LABELS, Produto, Ingrediente, Cliente,
 } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StatusTimelineComponent } from '../../shared/components/status-timeline.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
+import { AvatarComponent } from '../../shared/components/avatar.component';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
 
 interface ComposicaoTemp {
@@ -38,7 +40,7 @@ interface ComposicaoTemp {
     CommonModule, FormsModule, ButtonModule, ToastModule,
     DialogModule, SelectModule, InputTextModule, InputNumberModule,
     ConfirmDialogModule, TextareaModule,
-    PageHeaderComponent, StatusTimelineComponent, StatusBadgeComponent, CurrencyBrlPipe,
+    PageHeaderComponent, StatusTimelineComponent, StatusBadgeComponent, AvatarComponent, CurrencyBrlPipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './pedido-detail.component.html',
@@ -47,12 +49,14 @@ export class PedidoDetailComponent implements OnInit {
   private service = inject(PedidoService);
   private produtoService = inject(ProdutoService);
   private ingredienteService = inject(IngredienteService);
+  private clienteService = inject(ClienteService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
 
   pedido: Pedido | null = null;
+  cliente: Cliente | null = null;
   loading = false;
 
   // Dialog adicionar item
@@ -95,7 +99,13 @@ export class PedidoDetailComponent implements OnInit {
   carregarPedido(id: string): void {
     this.loading = true;
     this.service.buscarPorId(id).subscribe({
-      next: (data) => { this.pedido = data; this.loading = false; },
+      next: (data) => {
+        this.pedido = data;
+        this.loading = false;
+        this.clienteService.buscarPorId(data.cliente_id).subscribe({
+          next: (c) => this.cliente = c,
+        });
+      },
       error: () => { this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Pedido não encontrado' }); this.voltar(); },
     });
   }

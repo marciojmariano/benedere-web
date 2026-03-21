@@ -2,42 +2,99 @@
   <p-toast />
   <p-confirmDialog />
 
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800">Índices de Markup</h2>
-      <p class="text-gray-500 text-sm mt-1">Gerencie os índices de markup</p>
-    </div>
+  <app-page-header title="Índices de Markup" subtitle="Componentes que formam o fator de precificação">
     <p-button label="Novo Índice" icon="pi pi-plus" (onClick)="novo()" />
-  </div>
+  </app-page-header>
 
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-    <p-table [value]="indices" [loading]="loading" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Nome</th>
-          <th>Percentual</th>
-          <th>Descrição</th>
-          <th>Status</th>
-          <th style="width: 120px">Ações</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-i>
-        <tr>
-          <td class="font-medium">{{ i.nome }}</td>
-          <td>{{ i.percentual }}%</td>
-          <td>{{ i.descricao || '—' }}</td>
-          <td><p-tag [value]="i.ativo ? 'Ativo' : 'Inativo'" [severity]="i.ativo ? 'success' : 'danger'" /></td>
-          <td>
-            <div class="flex gap-2">
-              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="editar(i)" />
-              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="confirmarDesativar(i)" />
+  @if (loading) {
+    <div class="flex items-center justify-center h-48">
+      <i class="pi pi-spin pi-spinner text-3xl text-emerald-500"></i>
+    </div>
+  } @else {
+
+    <!-- Busca + contador -->
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-sm text-zinc-400">{{ indicesFiltrados.length }} índice(s)</span>
+      <div class="relative">
+        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
+        <input
+          pInputText
+          type="text"
+          placeholder="Buscar índice..."
+          class="w-64 pl-9"
+          [(ngModel)]="busca"
+        />
+      </div>
+    </div>
+
+    @if (indicesFiltrados.length === 0) {
+      <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-200 p-12 text-center">
+        <i class="pi pi-chart-bar text-4xl text-zinc-300 mb-3 block"></i>
+        <p class="text-zinc-400 font-medium">Nenhum índice encontrado</p>
+        <p class="text-zinc-300 text-sm mt-1">Crie o primeiro índice para compor seus markups</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (i of indicesFiltrados; track i.id) {
+          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+
+            <!-- Header do card -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                  <i class="pi pi-chart-bar text-emerald-600"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-zinc-800">{{ i.nome }}</h3>
+                  @if (i.descricao) {
+                    <p class="text-xs text-zinc-400 mt-0.5 line-clamp-1">{{ i.descricao }}</p>
+                  }
+                </div>
+              </div>
+              <app-status-badge [status]="i.ativo ? 'ativo' : 'inativo'" />
             </div>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr><td colspan="5" class="text-center text-gray-400 py-8">Nenhum índice encontrado</td></tr>
-      </ng-template>
-    </p-table>
-  </div>
+
+            <!-- Percentual em destaque -->
+            <div class="flex items-end justify-between mb-4">
+              <div>
+                <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Percentual</p>
+                <p class="text-3xl font-bold text-emerald-600">{{ i.percentual }}<span class="text-lg text-emerald-400">%</span></p>
+              </div>
+              <div class="text-right">
+                <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Contribuição</p>
+                <p class="text-sm font-semibold text-zinc-600">× {{ (1 + +i.percentual / 100).toFixed(4) }}</p>
+              </div>
+            </div>
+
+            <!-- Barra de progresso visual -->
+            <div class="mb-4">
+              <div class="h-1.5 rounded-full bg-zinc-100 overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-emerald-400 transition-all duration-500"
+                  [style.width.%]="Math.min(+i.percentual, 100)"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="flex gap-2 pt-3 border-t border-zinc-100">
+              <button
+                class="flex-1 py-2 rounded-lg text-sm font-medium text-emerald-600 hover:bg-emerald-50 transition-colors"
+                (click)="editar(i)"
+              >
+                <i class="pi pi-pencil mr-1.5"></i>Editar
+              </button>
+              <button
+                class="py-2 px-3 rounded-lg text-sm text-zinc-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                (click)="confirmarDesativar(i)"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  }
 </div>

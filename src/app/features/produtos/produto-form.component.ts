@@ -132,4 +132,7 @@ export class ProdutoFormComponent implements OnInit {
 
   voltar(): void { this.router.navigate(['/produtos']); }
   isInvalid(campo: string): boolean { const c = this.form.get(campo); return !!(c?.invalid && c?.touched); }
+  getTipoLabel(value: string | null): string {
+    return this.tiposRefeicao.find(t => t.value === value)?.label || '';
+  }
 }

@@ -1,48 +1,199 @@
 <div>
   <p-toast />
 
-  <app-page-header title="Novo Pedido" subtitle="Crie um novo pedido de venda">
-    <p-button label="Voltar" icon="pi pi-arrow-left" [outlined]="true" severity="secondary" (onClick)="voltar()" />
+  <app-page-header title="Novo Pedido" subtitle="Selecione o cliente e configure o pedido">
+    <p-button label="Voltar" icon="pi pi-arrow-left" [text]="true" severity="secondary" (onClick)="voltar()" />
   </app-page-header>
 
-  <form [formGroup]="form" (ngSubmit)="salvar()">
-    <div class="bg-white rounded-2xl shadow-sm border border-zinc-100 p-6 mb-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Cliente *</label>
-          <p-select formControlName="cliente_id" [options]="clientes"
-                    optionLabel="nome" optionValue="id" placeholder="Selecione o cliente..."
-                    [filter]="true" filterPlaceholder="Buscar cliente..." />
-          @if (isInvalid('cliente_id')) {
-            <small class="text-rose-500 text-xs">Cliente é obrigatório</small>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Formulário -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+
+        <!-- Indicador de etapas -->
+        <div class="px-6 pt-5 pb-4 border-b border-zinc-100">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-emerald-500 text-white text-xs flex items-center justify-center font-bold">1</div>
+              <span class="text-sm font-semibold text-zinc-700">Configurar pedido</span>
+            </div>
+            <div class="flex-1 h-px bg-zinc-100"></div>
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-zinc-200 text-zinc-400 text-xs flex items-center justify-center font-bold">2</div>
+              <span class="text-sm text-zinc-400">Adicionar itens</span>
+            </div>
+            <div class="flex-1 h-px bg-zinc-100"></div>
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-zinc-200 text-zinc-400 text-xs flex items-center justify-center font-bold">3</div>
+              <span class="text-sm text-zinc-400">Aprovar</span>
+            </div>
+          </div>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="salvar()">
+          <div class="p-6 space-y-5">
+
+            <!-- Cliente -->
+            <div>
+              <label class="block text-sm font-semibold text-zinc-700 mb-1.5">
+                Cliente <span class="text-rose-500">*</span>
+              </label>
+              <p-select
+                formControlName="cliente_id"
+                [options]="clientes"
+                optionLabel="nome"
+                optionValue="id"
+                placeholder="Selecione o cliente..."
+                [filter]="true"
+                filterPlaceholder="Buscar cliente..."
+                styleClass="w-full"
+                [class.ng-invalid]="isInvalid('cliente_id')"
+              />
+              @if (isInvalid('cliente_id')) {
+                <small class="text-rose-500 flex items-center gap-1 mt-1">
+                  <i class="pi pi-exclamation-circle text-xs"></i>Selecione um cliente
+                </small>
+              }
+            </div>
+
+            <!-- Markup -->
+            <div>
+              <label class="block text-sm font-semibold text-zinc-700 mb-1.5">Markup de precificação</label>
+              <p-select
+                formControlName="markup_id"
+                [options]="markups"
+                optionLabel="nome"
+                optionValue="id"
+                placeholder="Herdar do cliente ou padrão do sistema"
+                [showClear]="true"
+                styleClass="w-full"
+              />
+              @if (clienteSelecionado()?.markup_id_padrao && !form.get('markup_id')?.value) {
+                <p class="text-xs text-zinc-400 mt-1">
+                  <i class="pi pi-info-circle mr-1"></i>
+                  Cliente possui markup padrão que será usado automaticamente
+                </p>
+              } @else {
+                <p class="text-xs text-zinc-400 mt-1">Opcional — define o fator de precificação dos itens</p>
+              }
+            </div>
+
+            <!-- Observações -->
+            <div>
+              <label class="block text-sm font-semibold text-zinc-700 mb-1.5">Observações</label>
+              <textarea
+                pTextarea
+                formControlName="observacoes"
+                rows="3"
+                placeholder="Restrições alimentares, instruções de entrega, informações adicionais..."
+                class="w-full resize-none"
+              ></textarea>
+            </div>
+
+          </div>
+
+          <!-- Aviso rascunho -->
+          <div class="mx-6 mb-5 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <div class="flex items-start gap-2 text-amber-700">
+              <i class="pi pi-info-circle mt-0.5 shrink-0"></i>
+              <p class="text-sm leading-relaxed">
+                O pedido será criado como <strong>rascunho</strong>. Após criar, você será redirecionado para adicionar os itens do pedido.
+              </p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-4 border-t border-zinc-100 flex gap-3 justify-end bg-zinc-50/50">
+            <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="voltar()" />
+            <p-button
+              label="Criar Pedido e Adicionar Itens"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              type="submit"
+              [loading]="salvando"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Painel lateral: preview do cliente -->
+    <div class="space-y-4">
+
+      @if (clienteSelecionado()) {
+        <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5">
+          <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-4">Cliente selecionado</p>
+          <div class="flex items-center gap-3 mb-4">
+            <app-avatar [name]="clienteSelecionado()!.nome" size="md" />
+            <div class="min-w-0">
+              <p class="font-semibold text-zinc-800 truncate">{{ clienteSelecionado()!.nome }}</p>
+              <p class="text-xs text-zinc-400 truncate">{{ clienteSelecionado()!.email || 'Sem email' }}</p>
+            </div>
+          </div>
+
+          @if (clienteSelecionado()!.telefone) {
+            <div class="flex items-center gap-2 text-sm text-zinc-500 mb-2">
+              <i class="pi pi-phone text-xs text-zinc-400"></i>
+              {{ clienteSelecionado()!.telefone }}
+            </div>
+          }
+
+          @if (clienteSelecionado()!.observacoes) {
+            <div class="mt-3 pt-3 border-t border-zinc-100">
+              <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1">Observações do cliente</p>
+              <p class="text-xs text-zinc-600 leading-relaxed">{{ clienteSelecionado()!.observacoes }}</p>
+            </div>
           }
         </div>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Markup (opcional)</label>
-          <p-select formControlName="markup_id" [options]="markups"
-                    optionLabel="nome" optionValue="id" placeholder="Herdar do cliente/tenant"
-                    [showClear]="true" />
-          <small class="text-zinc-300 text-xs">Se não informado, herda do cliente ou tenant</small>
+        @if (markupSelecionado()) {
+          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5">
+            <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">Markup aplicado</p>
+            <div class="flex items-center justify-between">
+              <span class="font-medium text-zinc-700">{{ markupSelecionado()!.nome }}</span>
+              <span class="text-xl font-bold text-emerald-600">{{ (+markupSelecionado()!.fator).toFixed(4) }}x</span>
+            </div>
+            @if (markupSelecionado()!.indices.length) {
+              <div class="flex flex-wrap gap-1 mt-3">
+                @for (idx of markupSelecionado()!.indices; track idx.id) {
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200">
+                    {{ idx.nome }} {{ idx.percentual }}%
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-200 p-8 text-center">
+          <i class="pi pi-user text-3xl text-zinc-300 mb-3 block"></i>
+          <p class="text-sm font-medium text-zinc-400">Selecione um cliente</p>
+          <p class="text-xs text-zinc-300 mt-1">As informações aparecerão aqui</p>
         </div>
+      }
 
-        <div class="md:col-span-2 flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Observações</label>
-          <textarea pTextarea formControlName="observacoes" rows="3" placeholder="Observações opcionais"></textarea>
+      <!-- Fluxo do pedido -->
+      <div class="bg-emerald-50 rounded-2xl border border-emerald-100 p-5">
+        <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-3">Fluxo do pedido</p>
+        <div class="space-y-2">
+          @for (step of [
+            { icon: 'pi-file-edit', label: 'Rascunho', desc: 'Adicionar e editar itens' },
+            { icon: 'pi-check-circle', label: 'Aprovado', desc: 'Pedido confirmado' },
+            { icon: 'pi-cog', label: 'Em Produção', desc: 'Sendo preparado' },
+            { icon: 'pi-truck', label: 'Entregue', desc: 'Concluído' }
+          ]; track step.label; let first = $first) {
+            <div class="flex items-center gap-2">
+              <i [class]="'pi ' + step.icon + ' text-xs ' + (first ? 'text-emerald-600' : 'text-emerald-400')"></i>
+              <div>
+                <span [class]="'text-xs font-semibold ' + (first ? 'text-emerald-700' : 'text-emerald-600')">{{ step.label }}</span>
+                <span class="text-xs text-emerald-500"> — {{ step.desc }}</span>
+              </div>
+            </div>
+          }
         </div>
       </div>
-    </div>
 
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-      <div class="flex items-center gap-2 text-amber-700">
-        <i class="pi pi-info-circle"></i>
-        <span class="text-sm">O pedido será criado como <strong>rascunho</strong>. Após criar, você poderá adicionar itens.</span>
-      </div>
     </div>
-
-    <div class="flex justify-end gap-3">
-      <p-button label="Cancelar" [outlined]="true" severity="secondary" (onClick)="voltar()" />
-      <p-button label="Criar Pedido" icon="pi pi-check" type="submit" [loading]="salvando" />
-    </div>
-  </form>
+  </div>
 </div>

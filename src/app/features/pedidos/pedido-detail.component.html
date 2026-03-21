@@ -10,141 +10,209 @@
 
   @if (pedido) {
     <app-page-header [title]="'Pedido ' + pedido.numero" subtitle="Detalhes e itens do pedido">
-      <p-button label="Voltar" icon="pi pi-arrow-left" [outlined]="true" severity="secondary" (onClick)="voltar()" />
+      <p-button label="Voltar" icon="pi pi-arrow-left" [text]="true" severity="secondary" (onClick)="voltar()" />
     </app-page-header>
 
-    <!-- Status Timeline -->
-    <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5 mb-5">
+    <!-- Status Timeline (full width) -->
+    <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5 mb-6">
       <app-status-timeline [currentStatus]="pedido.status" />
     </div>
 
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-      <div class="bg-white rounded-xl border border-zinc-100 p-4">
-        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Status</p>
-        <div class="mt-1"><app-status-badge [status]="pedido.status" /></div>
-      </div>
-      <div class="bg-white rounded-xl border border-zinc-100 p-4">
-        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Valor Total</p>
-        <p class="text-xl font-bold text-emerald-600 mt-1">{{ pedido.valor_total | currencyBrl }}</p>
-      </div>
-      <div class="bg-white rounded-xl border border-zinc-100 p-4">
-        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Itens</p>
-        <p class="text-xl font-bold text-zinc-800 mt-1">{{ pedido.itens.length }}</p>
-      </div>
-      <div class="bg-white rounded-xl border border-zinc-100 p-4">
-        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Criado em</p>
-        <p class="text-sm font-medium text-zinc-700 mt-1">{{ formatDate(pedido.created_at) }}</p>
-      </div>
-    </div>
+    <!-- 2-col layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    @if (pedido.observacoes) {
-      <div class="bg-white rounded-xl border border-zinc-100 p-4 mb-5">
-        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1">Observações</p>
-        <p class="text-sm text-zinc-600">{{ pedido.observacoes }}</p>
-      </div>
-    }
+      <!-- Coluna principal: itens -->
+      <div class="lg:col-span-2 space-y-4">
 
-    <!-- Itens do Pedido -->
-    <div class="flex items-center justify-between mb-3">
-      <h3 class="text-lg font-semibold text-zinc-700">Itens do Pedido</h3>
-      @if (isRascunho) {
-        <button
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
-          (click)="abrirDialogItem()"
-        >
-          <i class="pi pi-plus text-xs"></i> Adicionar Item
-        </button>
-      }
-    </div>
-
-    @if (pedido.itens.length === 0) {
-      <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-200 p-12 text-center mb-5">
-        <i class="pi pi-box text-4xl text-zinc-300 mb-3"></i>
-        <p class="text-zinc-400 font-medium">Nenhum item adicionado</p>
-        @if (isRascunho) {
-          <p class="text-zinc-300 text-sm mt-1">Clique em "Adicionar Item" para começar</p>
-        }
-      </div>
-    }
-
-    @for (item of pedido.itens; track item.id) {
-      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5 mb-3">
-        <div class="flex justify-between items-start">
-          <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-zinc-800">{{ item.nome_snapshot }}</span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ring-1"
-                    [class]="item.tipo === 'serie'
-                      ? 'bg-sky-50 text-sky-600 ring-sky-200'
-                      : 'bg-violet-50 text-violet-600 ring-violet-200'">
-                {{ item.tipo === 'serie' ? 'Série' : 'Personalizado' }}
-              </span>
-              @if (item.tipo_refeicao) {
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600">
-                  {{ getTipoRefeicaoLabel(item.tipo_refeicao) }}
-                </span>
-              }
-            </div>
-          </div>
-          <div class="text-right shrink-0 ml-4">
-            <p class="text-xs text-zinc-400">{{ item.quantidade }}x &middot; {{ item.preco_unitario | currencyBrl }}</p>
-            <p class="text-lg font-bold text-zinc-800">{{ item.preco_total | currencyBrl }}</p>
-          </div>
+        <!-- Header da lista -->
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-zinc-700">
+            Itens do Pedido
+            @if (pedido.itens.length > 0) {
+              <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-500">{{ pedido.itens.length }}</span>
+            }
+          </h3>
+          @if (isRascunho) {
+            <button
+              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+              (click)="abrirDialogItem()"
+            >
+              <i class="pi pi-plus text-xs"></i> Adicionar Item
+            </button>
+          }
         </div>
 
-        <!-- Composição expandida -->
-        @if (item.composicao.length > 0) {
-          <div class="mt-3 pl-3 border-l-2 border-emerald-200">
-            @for (c of item.composicao; track c.id) {
-              <div class="flex justify-between text-sm py-1">
-                <span class="text-zinc-600">{{ c.ingrediente_nome_snap }}</span>
-                <span class="text-zinc-400">{{ c.quantidade_g }}g</span>
+        <!-- Empty state -->
+        @if (pedido.itens.length === 0) {
+          <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-200 p-12 text-center">
+            <i class="pi pi-box text-4xl text-zinc-300 mb-3 block"></i>
+            <p class="text-zinc-400 font-medium">Nenhum item adicionado</p>
+            @if (isRascunho) {
+              <p class="text-zinc-300 text-sm mt-1">Clique em "Adicionar Item" para começar</p>
+            }
+          </div>
+        }
+
+        <!-- Cards de itens -->
+        @for (item of pedido.itens; track item.id) {
+          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5">
+            <div class="flex justify-between items-start">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="font-semibold text-zinc-800">{{ item.nome_snapshot }}</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ring-1"
+                        [class]="item.tipo === 'serie'
+                          ? 'bg-sky-50 text-sky-600 ring-sky-200'
+                          : 'bg-violet-50 text-violet-600 ring-violet-200'">
+                    {{ item.tipo === 'serie' ? 'Série' : 'Personalizado' }}
+                  </span>
+                  @if (item.tipo_refeicao) {
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600">
+                      {{ getTipoRefeicaoLabel(item.tipo_refeicao) }}
+                    </span>
+                  }
+                </div>
+                <p class="text-xs text-zinc-400">{{ item.composicao.length }} ingrediente{{ item.composicao.length !== 1 ? 's' : '' }}</p>
+              </div>
+              <div class="text-right shrink-0 ml-4">
+                <p class="text-xs text-zinc-400">{{ item.quantidade }}x &middot; {{ item.preco_unitario | currencyBrl }}</p>
+                <p class="text-lg font-bold text-zinc-800">{{ item.preco_total | currencyBrl }}</p>
+              </div>
+            </div>
+
+            <!-- Composição expandida -->
+            @if (item.composicao.length > 0) {
+              <div class="mt-3 pt-3 border-t border-zinc-100">
+                <div class="grid grid-cols-2 gap-x-6">
+                  @for (c of item.composicao; track c.id) {
+                    <div class="flex justify-between items-center py-1.5 border-b border-zinc-50 last:border-0">
+                      <span class="text-sm text-zinc-600">{{ c.ingrediente_nome_snap }}</span>
+                      <span class="text-xs font-medium text-zinc-400 tabular-nums">{{ c.quantidade_g }}g</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (isRascunho) {
+              <div class="mt-3 pt-3 border-t border-zinc-100 flex justify-end">
+                <button
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-500 hover:bg-rose-50 transition-colors"
+                  (click)="confirmarRemoverItem(item)"
+                >
+                  <i class="pi pi-trash text-xs"></i> Remover
+                </button>
               </div>
             }
           </div>
         }
 
-        @if (isRascunho) {
-          <div class="mt-3 pt-3 border-t border-zinc-100 flex justify-end">
-            <button
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-500 hover:bg-rose-50 transition-colors"
-              (click)="confirmarRemoverItem(item)"
-            >
-              <i class="pi pi-trash text-xs"></i> Remover
-            </button>
+        @if (pedido.observacoes) {
+          <div class="bg-amber-50 rounded-xl border border-amber-100 p-4">
+            <p class="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">Observações</p>
+            <p class="text-sm text-amber-800 leading-relaxed">{{ pedido.observacoes }}</p>
           </div>
         }
       </div>
-    }
 
-    <!-- Ações de status -->
-    @if (!isFinalizado) {
-      <div class="mt-5 flex gap-3">
-        @if (pedido.status === 'rascunho') {
-          <button class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
-                  (click)="mudarStatus($any('aprovado'))">
-            <i class="pi pi-check mr-2"></i>Aprovar Pedido
-          </button>
+      <!-- Painel lateral -->
+      <div class="space-y-4">
+
+        <!-- Card do cliente -->
+        @if (cliente) {
+          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5">
+            <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-4">Cliente</p>
+            <div class="flex items-center gap-3 mb-4">
+              <app-avatar [name]="cliente.nome" size="md" />
+              <div class="min-w-0">
+                <p class="font-semibold text-zinc-800 truncate">{{ cliente.nome }}</p>
+                <p class="text-xs text-zinc-400 truncate">{{ cliente.email || 'Sem email' }}</p>
+              </div>
+            </div>
+            @if (cliente.telefone) {
+              <div class="flex items-center gap-2 text-sm text-zinc-500">
+                <i class="pi pi-phone text-xs text-zinc-400"></i>
+                {{ cliente.telefone }}
+              </div>
+            }
+          </div>
         }
-        @if (pedido.status === 'aprovado') {
-          <button class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-                  (click)="mudarStatus($any('em_producao'))">
-            <i class="pi pi-cog mr-2"></i>Iniciar Produção
-          </button>
+
+        <!-- Resumo financeiro -->
+        <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5">
+          <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-4">Resumo</p>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-zinc-500">Status</span>
+              <app-status-badge [status]="pedido.status" />
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-zinc-500">Itens</span>
+              <span class="font-semibold text-zinc-800">{{ pedido.itens.length }}</span>
+            </div>
+            <div class="border-t border-zinc-100 pt-3">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-semibold text-zinc-700">Total</span>
+                <span class="text-xl font-bold text-emerald-600">{{ pedido.valor_total | currencyBrl }}</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-[10px] text-zinc-300 mt-3">Criado em {{ formatDate(pedido.created_at) }}</p>
+        </div>
+
+        <!-- Ações de status -->
+        @if (!isFinalizado) {
+          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5 space-y-2">
+            <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">Ações</p>
+
+            @if (pedido.status === 'rascunho') {
+              <button
+                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+                (click)="mudarStatus($any('aprovado'))"
+              >
+                <i class="pi pi-check"></i>Aprovar Pedido
+              </button>
+            }
+            @if (pedido.status === 'aprovado') {
+              <button
+                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-violet-500 text-white hover:bg-violet-600 transition-colors"
+                (click)="mudarStatus($any('em_producao'))"
+              >
+                <i class="pi pi-cog"></i>Iniciar Produção
+              </button>
+            }
+            @if (pedido.status === 'em_producao') {
+              <button
+                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-teal-500 text-white hover:bg-teal-600 transition-colors"
+                (click)="mudarStatus($any('entregue'))"
+              >
+                <i class="pi pi-truck"></i>Marcar Entregue
+              </button>
+            }
+            <button
+              class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors"
+              (click)="abrirCancelDialog()"
+            >
+              <i class="pi pi-times"></i>Cancelar Pedido
+            </button>
+          </div>
         }
-        @if (pedido.status === 'em_producao') {
-          <button class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-teal-500 text-white hover:bg-teal-600 transition-colors"
-                  (click)="mudarStatus($any('entregue'))">
-            <i class="pi pi-truck mr-2"></i>Marcar Entregue
-          </button>
+
+        @if (isFinalizado) {
+          <div class="bg-zinc-50 rounded-2xl border border-zinc-100 p-5 text-center">
+            @if (pedido.status === 'entregue') {
+              <i class="pi pi-check-circle text-2xl text-emerald-500 mb-2 block"></i>
+              <p class="text-sm font-semibold text-zinc-600">Pedido Entregue</p>
+              <p class="text-xs text-zinc-400 mt-1">Este pedido foi finalizado</p>
+            } @else {
+              <i class="pi pi-times-circle text-2xl text-rose-400 mb-2 block"></i>
+              <p class="text-sm font-semibold text-zinc-600">Pedido Cancelado</p>
+              <p class="text-xs text-zinc-400 mt-1">Este pedido foi cancelado</p>
+            }
+          </div>
         }
-        <button class="px-5 py-2.5 rounded-xl text-sm font-semibold border border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors"
-                (click)="abrirCancelDialog()">
-          <i class="pi pi-times mr-2"></i>Cancelar
-        </button>
       </div>
-    }
+    </div>
   }
 
   <!-- Dialog Adicionar Item -->
@@ -173,18 +241,18 @@
           <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Produto do Catálogo *</label>
           <p-select [(ngModel)]="produtoSelecionadoId" [options]="produtos"
                     optionLabel="nome" optionValue="id" placeholder="Selecione o produto..."
-                    [filter]="true" filterPlaceholder="Buscar..." />
+                    [filter]="true" filterPlaceholder="Buscar..." styleClass="w-full" />
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Tipo Refeição (override)</label>
             <p-select [(ngModel)]="serieTipoRefeicao" [options]="tiposRefeicao"
                       optionLabel="label" optionValue="value" placeholder="Herdar do catálogo"
-                      [showClear]="true" />
+                      [showClear]="true" styleClass="w-full" />
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Quantidade</label>
-            <p-inputNumber [(ngModel)]="serieQuantidade" [min]="1" [showButtons]="true" />
+            <p-inputNumber [(ngModel)]="serieQuantidade" [min]="1" [showButtons]="true" styleClass="w-full" />
           </div>
         </div>
       </div>
@@ -195,18 +263,18 @@
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Nome da Marmita *</label>
-          <input pInputText [(ngModel)]="persNome" placeholder="Ex: Marmita Low Carb" />
+          <input pInputText [(ngModel)]="persNome" placeholder="Ex: Marmita Low Carb" class="w-full" />
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Tipo Refeição</label>
             <p-select [(ngModel)]="persTipoRefeicao" [options]="tiposRefeicao"
                       optionLabel="label" optionValue="value" placeholder="Selecione..."
-                      [showClear]="true" />
+                      [showClear]="true" styleClass="w-full" />
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Quantidade</label>
-            <p-inputNumber [(ngModel)]="persQuantidade" [min]="1" [showButtons]="true" />
+            <p-inputNumber [(ngModel)]="persQuantidade" [min]="1" [showButtons]="true" styleClass="w-full" />
           </div>
         </div>
 
@@ -222,9 +290,9 @@
           <div class="flex items-center gap-2 mb-3">
             <p-select [(ngModel)]="novoIngredienteId" [options]="ingredientesDisponiveis"
                       optionLabel="nome" optionValue="id" placeholder="Ingrediente..."
-                      [filter]="true" filterPlaceholder="Buscar..." class="flex-1" />
+                      [filter]="true" filterPlaceholder="Buscar..." styleClass="flex-1" />
             <div class="w-28 shrink-0">
-              <p-inputNumber [(ngModel)]="novoIngredienteQtd" suffix=" g" [min]="1" placeholder="Qtd" />
+              <p-inputNumber [(ngModel)]="novoIngredienteQtd" suffix=" g" [min]="1" placeholder="Qtd" styleClass="w-full" />
             </div>
             <button
               class="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors shrink-0"
@@ -282,10 +350,13 @@
   <p-dialog header="Cancelar Pedido" [(visible)]="showCancelDialog" [modal]="true"
             [style]="{ width: '450px' }">
     <div class="flex flex-col gap-3">
-      <p class="text-sm text-zinc-600">Deseja realmente cancelar este pedido? Esta ação não pode ser desfeita.</p>
+      <div class="flex items-start gap-3 p-3 bg-rose-50 rounded-xl border border-rose-100">
+        <i class="pi pi-exclamation-triangle text-rose-500 mt-0.5"></i>
+        <p class="text-sm text-rose-700">Deseja realmente cancelar este pedido? Esta ação não pode ser desfeita.</p>
+      </div>
       <div class="flex flex-col gap-1.5">
         <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Motivo (opcional)</label>
-        <textarea pTextarea [(ngModel)]="motivoCancelamento" rows="3" placeholder="Informe o motivo do cancelamento..."></textarea>
+        <textarea pTextarea [(ngModel)]="motivoCancelamento" rows="3" placeholder="Informe o motivo do cancelamento..." class="w-full resize-none"></textarea>
       </div>
     </div>
     <ng-template pTemplate="footer">
