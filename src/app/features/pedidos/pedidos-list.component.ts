@@ -58,6 +58,19 @@ export class PedidosListComponent implements OnInit {
   get pedidosPendentes(): number { return this.pedidos.filter(p => p.status === StatusPedido.RASCUNHO || p.status === StatusPedido.APROVADO).length; }
   get pedidosEmProducao(): number { return this.pedidos.filter(p => p.status === StatusPedido.EM_PRODUCAO).length; }
   get pedidosEntregues(): number { return this.pedidos.filter(p => p.status === StatusPedido.ENTREGUE).length; }
+  get valorTotal(): number { return this.pedidos.reduce((acc, p) => acc + parseFloat(p.valor_total), 0); }
+
+  chipClass(status: StatusPedido): string {
+    if (this.statusFiltro !== status) return 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300';
+    const map: Record<StatusPedido, string> = {
+      [StatusPedido.RASCUNHO]:    'bg-zinc-600 text-white border-zinc-600',
+      [StatusPedido.APROVADO]:    'bg-amber-500 text-white border-amber-500',
+      [StatusPedido.EM_PRODUCAO]: 'bg-violet-500 text-white border-violet-500',
+      [StatusPedido.ENTREGUE]:    'bg-emerald-500 text-white border-emerald-500',
+      [StatusPedido.CANCELADO]:   'bg-rose-500 text-white border-rose-500',
+    };
+    return map[status];
+  }
 
   novo(): void { this.router.navigate(['/pedidos/novo']); }
   ver(p: PedidoResumo): void { this.router.navigate(['/pedidos', p.id]); }

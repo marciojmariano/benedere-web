@@ -7,21 +7,41 @@
 
   <!-- KPI Summary -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-    <div class="bg-white rounded-xl border border-zinc-100 px-4 py-3">
-      <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Total</p>
-      <p class="text-xl font-bold text-zinc-800">{{ totalPedidos }}</p>
+    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+        <i class="pi pi-list text-zinc-500 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Total</p>
+        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ totalPedidos }}</p>
+      </div>
     </div>
-    <div class="bg-white rounded-xl border border-zinc-100 px-4 py-3">
-      <p class="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Pendentes</p>
-      <p class="text-xl font-bold text-zinc-800">{{ pedidosPendentes }}</p>
+    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+        <i class="pi pi-clock text-amber-500 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Pendentes</p>
+        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ pedidosPendentes }}</p>
+      </div>
     </div>
-    <div class="bg-white rounded-xl border border-zinc-100 px-4 py-3">
-      <p class="text-[10px] font-semibold text-violet-500 uppercase tracking-wide">Em Produção</p>
-      <p class="text-xl font-bold text-zinc-800">{{ pedidosEmProducao }}</p>
+    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
+        <i class="pi pi-cog text-violet-500 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-semibold text-violet-500 uppercase tracking-wide">Em Produção</p>
+        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ pedidosEmProducao }}</p>
+      </div>
     </div>
-    <div class="bg-white rounded-xl border border-zinc-100 px-4 py-3">
-      <p class="text-[10px] font-semibold text-emerald-500 uppercase tracking-wide">Entregues</p>
-      <p class="text-xl font-bold text-zinc-800">{{ pedidosEntregues }}</p>
+    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+        <i class="pi pi-truck text-emerald-500 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-semibold text-emerald-500 uppercase tracking-wide">Entregues</p>
+        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ pedidosEntregues }}</p>
+      </div>
     </div>
   </div>
 
@@ -30,9 +50,7 @@
     @for (status of statusOptions; track status) {
       <button
         class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors border"
-        [class]="statusFiltro === status
-          ? 'bg-emerald-500 text-white border-emerald-500'
-          : 'bg-white text-zinc-600 border-zinc-200 hover:border-emerald-300 hover:text-emerald-600'"
+        [class]="chipClass(status)"
         (click)="toggleStatus(status)"
       >
         {{ statusLabels[status] }}
@@ -53,7 +71,13 @@
              [globalFilterFields]="['numero']" styleClass="p-datatable-sm">
       <ng-template pTemplate="caption">
         <div class="flex justify-between items-center">
-          <span class="text-sm text-zinc-400">{{ pedidos.length }} pedido(s)</span>
+          <span class="text-sm text-zinc-400">
+            {{ pedidos.length }} pedido{{ pedidos.length !== 1 ? 's' : '' }}
+            @if (pedidos.length > 0) {
+              &nbsp;&middot;&nbsp;
+              <span class="text-emerald-600 font-semibold">{{ valorTotal | currencyBrl }}</span>
+            }
+          </span>
           <div class="relative">
             <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
             <input pInputText type="text" placeholder="Buscar por número..." class="w-56 pl-9"
@@ -92,10 +116,14 @@
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="6" class="text-center py-12">
-            <div class="text-zinc-300">
-              <i class="pi pi-shopping-cart text-4xl mb-3"></i>
+            <div>
+              <i class="pi pi-shopping-cart text-4xl text-zinc-300 mb-3 block"></i>
               <p class="text-zinc-400 font-medium">Nenhum pedido encontrado</p>
-              <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro pedido clicando em "Novo Pedido"</p>
+              @if (!statusFiltro) {
+                <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro pedido clicando em "Novo Pedido"</p>
+              } @else {
+                <p class="text-zinc-300 text-sm mt-1">Nenhum pedido com status "{{ statusLabels[statusFiltro] }}"</p>
+              }
             </div>
           </td>
         </tr>

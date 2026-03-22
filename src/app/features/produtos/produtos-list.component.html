@@ -6,6 +6,46 @@
     <p-button label="Novo Produto" icon="pi pi-plus" (onClick)="novo()" />
   </app-page-header>
 
+  <!-- KPI Summary -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+        <i class="pi pi-shopping-bag text-zinc-500 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Total</p>
+        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ produtos.length }}</p>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+        <i class="pi pi-check-circle text-emerald-500 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-semibold text-emerald-500 uppercase tracking-wide">Ativos</p>
+        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ totalAtivos }}</p>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-rose-50 flex items-center justify-center shrink-0">
+        <i class="pi pi-times-circle text-rose-400 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-semibold text-rose-400 uppercase tracking-wide">Inativos</p>
+        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ totalInativos }}</p>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+        <i class="pi pi-tag text-amber-500 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Sem Tipo</p>
+        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ semTipo }}</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Filtros por tipo de refeição -->
   <div class="flex flex-wrap gap-2 mb-4">
     @for (tipo of tiposRefeicao; track tipo) {
@@ -16,7 +56,7 @@
           : 'bg-white text-zinc-600 border-zinc-200 hover:border-emerald-300 hover:text-emerald-600'"
         (click)="toggleFiltroTipo(tipo)"
       >
-        {{ tipoRefeicaoLabels[tipo] }}
+        {{ tipoEmojis[tipo] }} {{ tipoRefeicaoLabels[tipo] }}
       </button>
     }
     @if (filtroTipo) {
@@ -34,7 +74,13 @@
              [globalFilterFields]="['nome']" styleClass="p-datatable-sm">
       <ng-template pTemplate="caption">
         <div class="flex justify-between items-center">
-          <span class="text-sm text-zinc-400">{{ produtosFiltrados.length }} produto(s)</span>
+          <span class="text-sm text-zinc-400">
+            {{ produtosFiltrados.length }} produto{{ produtosFiltrados.length !== 1 ? 's' : '' }}
+            @if (filtroTipo) {
+              &nbsp;&middot;&nbsp;
+              <span class="text-emerald-600 font-semibold">{{ tipoEmojis[filtroTipo] }} {{ tipoRefeicaoLabels[filtroTipo] }}</span>
+            }
+          </span>
           <div class="relative">
             <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
             <input pInputText type="text" placeholder="Buscar produto..." class="w-64 pl-9"
@@ -56,14 +102,14 @@
           <td class="font-medium text-zinc-800">{{ p.nome }}</td>
           <td>
             @if (p.tipo_refeicao) {
-              <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-600">
-                {{ getTipoRefeicaoLabel(p.tipo_refeicao) }}
+              <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                {{ getTipoEmoji(p.tipo_refeicao) }} {{ getTipoRefeicaoLabel(p.tipo_refeicao) }}
               </span>
             } @else {
               <span class="text-zinc-300">—</span>
             }
           </td>
-          <td class="text-zinc-600">{{ p.peso_total_g }}g</td>
+          <td class="text-zinc-600 tabular-nums">{{ p.peso_total_g }}g</td>
           <td><app-status-badge [status]="p.ativo ? 'ativo' : 'inativo'" /></td>
           <td>
             <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -88,10 +134,14 @@
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="5" class="text-center py-12">
-            <div class="text-zinc-300">
-              <i class="pi pi-box text-4xl mb-3"></i>
+            <div>
+              <i class="pi pi-box text-4xl text-zinc-300 mb-3 block"></i>
               <p class="text-zinc-400 font-medium">Nenhum produto encontrado</p>
-              <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro produto clicando em "Novo Produto"</p>
+              @if (filtroTipo) {
+                <p class="text-zinc-300 text-sm mt-1">Nenhum produto com tipo "{{ tipoRefeicaoLabels[filtroTipo] }}"</p>
+              } @else {
+                <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro produto clicando em "Novo Produto"</p>
+              }
             </div>
           </td>
         </tr>

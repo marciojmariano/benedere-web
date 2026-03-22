@@ -36,6 +36,14 @@ export class ProdutosListComponent implements OnInit {
   tipoRefeicaoLabels = TIPO_REFEICAO_LABELS;
   tiposRefeicao = Object.values(TipoRefeicao);
 
+  tipoEmojis: Record<TipoRefeicao, string> = {
+    [TipoRefeicao.CAFE_MANHA]:   '☕',
+    [TipoRefeicao.LANCHE_MANHA]: '🥐',
+    [TipoRefeicao.ALMOCO]:       '🍽️',
+    [TipoRefeicao.LANCHE_TARDE]: '🥪',
+    [TipoRefeicao.JANTAR]:       '🌙',
+  };
+
   ngOnInit(): void { this.carregar(); }
 
   carregar(): void {
@@ -58,11 +66,19 @@ export class ProdutosListComponent implements OnInit {
     this.filtroTipo = this.filtroTipo === tipo ? null : tipo;
   }
 
+  get totalAtivos(): number { return this.produtos.filter(p => p.ativo).length; }
+  get totalInativos(): number { return this.produtos.filter(p => !p.ativo).length; }
+  get semTipo(): number { return this.produtos.filter(p => !p.tipo_refeicao).length; }
+
   novo(): void { this.router.navigate(['/produtos/novo']); }
   editar(p: Produto): void { this.router.navigate(['/produtos', p.id]); }
 
   getTipoRefeicaoLabel(tipo: TipoRefeicao | null): string {
     return tipo ? this.tipoRefeicaoLabels[tipo] : '—';
+  }
+
+  getTipoEmoji(tipo: TipoRefeicao | null): string {
+    return tipo ? this.tipoEmojis[tipo] : '';
   }
 
   confirmarDesativar(p: Produto): void {
