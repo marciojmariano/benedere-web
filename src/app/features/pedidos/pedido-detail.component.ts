@@ -16,6 +16,7 @@ import { PedidoService } from '../../core/services/pedido.service';
 import { ProdutoService } from '../../core/services/produto.service';
 import { IngredienteService } from '../../core/services/ingrediente.service';
 import { ClienteService } from '../../core/services/cliente.service';
+import { PedidoPrintService } from '../../core/services/pedido-print.service';
 import {
   Pedido, PedidoItem, StatusPedido, TipoItem, TipoRefeicao,
   TIPO_REFEICAO_LABELS, Produto, Ingrediente, Cliente,
@@ -54,6 +55,7 @@ export class PedidoDetailComponent implements OnInit {
   private router = inject(Router);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
+  private printService = inject(PedidoPrintService);
 
   pedido: Pedido | null = null;
   cliente: Cliente | null = null;
@@ -262,6 +264,17 @@ export class PedidoDetailComponent implements OnInit {
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────
+
+  imprimirPedido(): void {
+    if (!this.pedido || !this.cliente) return;
+    const ok = this.printService.imprimir(this.pedido, this.cliente);
+    if (!ok) {
+      this.messageService.add({
+        severity: 'warn', summary: 'Atenção',
+        detail: 'Permita pop-ups para imprimir o pedido',
+      });
+    }
+  }
 
   voltar(): void { this.router.navigate(['/pedidos']); }
   getTipoRefeicaoLabel(tipo: TipoRefeicao | null): string { return tipo ? TIPO_REFEICAO_LABELS[tipo] : '—'; }

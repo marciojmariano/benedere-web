@@ -11,6 +11,7 @@
   @if (pedido) {
     <app-page-header [title]="'Pedido ' + pedido.numero" subtitle="Detalhes e itens do pedido">
       <p-button label="Voltar" icon="pi pi-arrow-left" [text]="true" severity="secondary" (onClick)="voltar()" />
+      <p-button label="Imprimir" icon="pi pi-print" [outlined]="true" (onClick)="imprimirPedido()" />
     </app-page-header>
 
     <!-- Status Timeline (full width) -->
