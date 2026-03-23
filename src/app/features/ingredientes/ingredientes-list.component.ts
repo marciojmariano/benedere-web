@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -9,7 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { IngredienteService } from '../../core/services/ingrediente.service';
-import { Ingrediente } from '../../core/models';
+import { Ingrediente, UnidadeMedida } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
@@ -31,8 +31,22 @@ export class IngredientesListComponent implements OnInit {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
 
-  ingredientes: Ingrediente[] = [];
+  private todosIngredientes: Ingrediente[] = [];
+  busca = signal('');
+  unidadeFiltro = signal<UnidadeMedida | null>(null);
   loading = false;
+
+  unidades = Object.values(UnidadeMedida);
+
+  ingredientes = computed(() => {
+    const termo = this.busca().toLowerCase().trim();
+    const unidade = this.unidadeFiltro();
+    return this.todosIngredientes.filter(i => {
+      const buscaOk = !termo || i.nome.toLowerCase().includes(termo);
+      const unidadeOk = !unidade || i.unidade_medida === unidade;
+      return buscaOk && unidadeOk;
+    });
+  });
 
   drawerVisible = signal(false);
   ingredienteSelecionado = signal<Ingrediente | null>(null);
@@ -42,9 +56,18 @@ export class IngredientesListComponent implements OnInit {
   carregar(): void {
     this.loading = true;
     this.service.listar().subscribe({
-      next: (data) => { this.ingredientes = data; this.loading = false; },
+      next: (data) => { this.todosIngredientes = data; this.loading = false; },
       error: () => { this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao carregar ingredientes' }); this.loading = false; },
     });
+  }
+
+  toggleUnidade(u: UnidadeMedida): void {
+    this.unidadeFiltro.set(this.unidadeFiltro() === u ? null : u);
+  }
+
+  chipClass(u: UnidadeMedida): string {
+    if (this.unidadeFiltro() !== u) return 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300';
+    return 'bg-emerald-600 text-white border-emerald-600';
   }
 
   novo(): void { this.router.navigate(['/ingredientes/novo']); }

@@ -6,17 +6,31 @@
     <p-button label="Novo Ingrediente" icon="pi pi-plus" (onClick)="novo()" />
   </app-page-header>
 
+  <!-- Chips de unidade + busca -->
+  <div class="mb-4 flex flex-wrap items-center gap-3">
+    <div class="flex flex-wrap gap-2">
+      @for (u of unidades; track u) {
+        <button [class]="'px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors uppercase ' + chipClass(u)"
+                (click)="toggleUnidade(u)">
+          {{ u }}
+        </button>
+      }
+    </div>
+    <div class="relative ml-auto">
+      <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
+      <input pInputText type="text" placeholder="Buscar ingrediente..."
+             class="w-64 pl-9"
+             [value]="busca()"
+             (input)="busca.set($any($event.target).value)" />
+    </div>
+  </div>
+
   <div class="bg-white rounded-2xl shadow-sm border border-zinc-100">
-    <p-table #dt [value]="ingredientes" [loading]="loading" [paginator]="true" [rows]="10"
-             [globalFilterFields]="['nome']" styleClass="p-datatable-sm">
+    <p-table [value]="ingredientes()" [loading]="loading" [paginator]="true" [rows]="10"
+             styleClass="p-datatable-sm">
       <ng-template pTemplate="caption">
         <div class="flex justify-between items-center">
-          <span class="text-sm text-zinc-400">{{ ingredientes.length }} ingrediente(s)</span>
-          <div class="relative">
-            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
-            <input pInputText type="text" placeholder="Buscar ingrediente..." class="w-64 pl-9"
-                   (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
-          </div>
+          <span class="text-sm text-zinc-400">{{ ingredientes().length }} ingrediente(s)</span>
         </div>
       </ng-template>
       <ng-template pTemplate="header">
