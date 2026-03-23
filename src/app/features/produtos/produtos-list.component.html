@@ -112,7 +112,7 @@
           <td class="text-zinc-600 tabular-nums">{{ p.peso_total_g }}g</td>
           <td><app-status-badge [status]="p.ativo ? 'ativo' : 'inativo'" /></td>
           <td>
-            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div class="flex gap-1">
               <button
                 class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
                 (click)="editar(p)"
