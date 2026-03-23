@@ -32,7 +32,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-cliente>
-        <tr class="group">
+        <tr class="group cursor-pointer hover:bg-zinc-50/50 transition-colors" (click)="abrirDetalhe(cliente)">
           <td>
             <div class="flex items-center gap-3">
               <app-avatar [name]="cliente.nome" size="sm" />
@@ -43,7 +43,7 @@
           <td class="text-zinc-600">{{ cliente.telefone || '—' }}</td>
           <td><app-status-badge [status]="cliente.ativo ? 'ativo' : 'inativo'" /></td>
           <td>
-            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" (click)="$event.stopPropagation()">
               <button class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
                       (click)="editar(cliente)" title="Editar">
                 <i class="pi pi-pencil"></i>
@@ -66,4 +66,12 @@
       </ng-template>
     </p-table>
   </div>
+
+  <!-- Drawer de detalhes -->
+  <app-cliente-detail-drawer
+    [visible]="drawerVisible()"
+    [cliente]="clienteSelecionado()"
+    (visibleChange)="drawerVisible.set($event)"
+    (editar)="editar($event); drawerVisible.set(false)"
+  />
 </div>

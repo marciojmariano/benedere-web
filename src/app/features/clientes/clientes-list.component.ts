@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -13,6 +13,7 @@ import { Cliente } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 import { AvatarComponent } from '../../shared/components/avatar.component';
+import { ClienteDetailDrawerComponent } from './cliente-detail-drawer.component';
 
 @Component({
   selector: 'app-clientes-list',
@@ -20,7 +21,7 @@ import { AvatarComponent } from '../../shared/components/avatar.component';
   imports: [
     CommonModule, TableModule, ButtonModule, ToastModule,
     ConfirmDialogModule, InputTextModule,
-    PageHeaderComponent, StatusBadgeComponent, AvatarComponent,
+    PageHeaderComponent, StatusBadgeComponent, AvatarComponent, ClienteDetailDrawerComponent,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clientes-list.component.html',
@@ -34,6 +35,9 @@ export class ClientesListComponent implements OnInit {
   clientes: Cliente[] = [];
   loading = false;
 
+  drawerVisible = signal(false);
+  clienteSelecionado = signal<Cliente | null>(null);
+
   ngOnInit(): void { this.carregar(); }
 
   carregar(): void {
@@ -46,6 +50,11 @@ export class ClientesListComponent implements OnInit {
 
   novo(): void { this.router.navigate(['/clientes/novo']); }
   editar(cliente: Cliente): void { this.router.navigate(['/clientes', cliente.id]); }
+
+  abrirDetalhe(cliente: Cliente): void {
+    this.clienteSelecionado.set(cliente);
+    this.drawerVisible.set(true);
+  }
 
   confirmarDesativar(cliente: Cliente): void {
     this.confirmationService.confirm({
