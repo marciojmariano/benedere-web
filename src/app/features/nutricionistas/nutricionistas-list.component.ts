@@ -1,9 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { NutricionistaService } from '../../core/services/nutricionista.service';
@@ -16,7 +17,7 @@ import { AvatarComponent } from '../../shared/components/avatar.component';
   selector: 'app-nutricionistas-list',
   standalone: true,
   imports: [
-    CommonModule, ButtonModule, ToastModule, ConfirmDialogModule,
+    CommonModule, ButtonModule, ToastModule, ConfirmDialogModule, InputTextModule,
     PageHeaderComponent, StatusBadgeComponent, AvatarComponent,
   ],
   providers: [MessageService, ConfirmationService],
@@ -28,15 +29,26 @@ export class NutricionistasListComponent implements OnInit {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
 
-  nutricionistas: Nutricionista[] = [];
+  private todosNutricionistas: Nutricionista[] = [];
+  busca = signal('');
   loading = false;
+
+  nutricionistas = computed(() => {
+    const termo = this.busca().toLowerCase().trim();
+    if (!termo) return this.todosNutricionistas;
+    return this.todosNutricionistas.filter(n =>
+      n.nome.toLowerCase().includes(termo) ||
+      (n.crn || '').toLowerCase().includes(termo) ||
+      (n.email || '').toLowerCase().includes(termo)
+    );
+  });
 
   ngOnInit(): void { this.carregar(); }
 
   carregar(): void {
     this.loading = true;
     this.service.listar().subscribe({
-      next: (data) => { this.nutricionistas = data; this.loading = false; },
+      next: (data) => { this.todosNutricionistas = data; this.loading = false; },
       error: () => { this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao carregar nutricionistas' }); this.loading = false; },
     });
   }
