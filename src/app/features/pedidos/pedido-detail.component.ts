@@ -19,7 +19,7 @@ import { ClienteService } from '../../core/services/cliente.service';
 import { PedidoPrintService } from '../../core/services/pedido-print.service';
 import {
   Pedido, PedidoItem, StatusPedido, TipoItem, TipoRefeicao,
-  TIPO_REFEICAO_LABELS, Produto, Ingrediente, Cliente,
+  TIPO_REFEICAO_LABELS, TIPO_REFEICAO_META, Produto, Ingrediente, Cliente,
 } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StatusTimelineComponent } from '../../shared/components/status-timeline.component';
@@ -28,7 +28,7 @@ import { AvatarComponent } from '../../shared/components/avatar.component';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
 
 interface ComposicaoTemp {
-  ingrediente_id: string;
+  ingrediente_id: string | null;
   ingrediente_nome: string;
   quantidade_g: number;
   custo_unitario: number;
@@ -61,8 +61,8 @@ export class PedidoDetailComponent implements OnInit {
   cliente: Cliente | null = null;
   loading = false;
 
-  // Dialog adicionar item
-  showItemDialog = false;
+  // Builder inline adicionar item
+  showItemBuilder = false;
   itemTipo: TipoItem = TipoItem.SERIE;
   produtos: Produto[] = [];
   ingredientes: Ingrediente[] = [];
@@ -77,14 +77,16 @@ export class PedidoDetailComponent implements OnInit {
   persQuantidade = 1;
   persTipoRefeicao: TipoRefeicao | null = null;
   persComposicao: ComposicaoTemp[] = [];
-  novoIngredienteId: string | null = null;
-  novoIngredienteQtd = 0;
 
   // Cancelamento
   showCancelDialog = false;
   motivoCancelamento = '';
 
+  readonly MAX_INGREDIENTES = 4;
+  readonly Math = Math;
+
   tiposRefeicao = Object.values(TipoRefeicao).map(v => ({ label: TIPO_REFEICAO_LABELS[v], value: v }));
+  tiposRefeicaoMeta = TIPO_REFEICAO_META;
   tiposItem = [
     { label: 'Produto de Série', value: TipoItem.SERIE },
     { label: 'Personalizado', value: TipoItem.PERSONALIZADO },
@@ -142,7 +144,7 @@ export class PedidoDetailComponent implements OnInit {
 
   // ── Dialog adicionar item ───────────────────────────────────────────────
 
-  abrirDialogItem(): void {
+  abrirItemBuilder(): void {
     this.itemTipo = TipoItem.SERIE;
     this.produtoSelecionadoId = null;
     this.serieQuantidade = 1;
@@ -150,8 +152,9 @@ export class PedidoDetailComponent implements OnInit {
     this.persNome = '';
     this.persQuantidade = 1;
     this.persTipoRefeicao = null;
-    this.persComposicao = [];
-    this.showItemDialog = true;
+    this.persComposicao = [{ ingrediente_id: null, ingrediente_nome: '', quantidade_g: 0, custo_unitario: 0 }];
+    this.showItemBuilder = true;
+    setTimeout(() => document.getElementById('item-builder')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
 
   // ── Item série ──────────────────────────────────────────────────────────
@@ -168,7 +171,7 @@ export class PedidoDetailComponent implements OnInit {
     this.service.adicionarItem(this.pedido.id, item).subscribe({
       next: (data) => {
         this.pedido = data;
-        this.showItemDialog = false;
+        this.showItemBuilder = false;
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Item adicionado' });
       },
       error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao adicionar item' }),
@@ -177,30 +180,42 @@ export class PedidoDetailComponent implements OnInit {
 
   // ── Item personalizado ──────────────────────────────────────────────────
 
-  adicionarIngredienteTemp(): void {
-    if (!this.novoIngredienteId || this.novoIngredienteQtd <= 0) return;
-    const ing = this.ingredientes.find(i => i.id === this.novoIngredienteId);
-    if (!ing) return;
-    // Prevent duplicates
-    if (this.persComposicao.some(c => c.ingrediente_id === ing.id)) return;
+  adicionarLinhaIngrediente(): void {
+    if (this.persComposicao.length >= this.MAX_INGREDIENTES) return;
+    this.persComposicao.push({ ingrediente_id: null, ingrediente_nome: '', quantidade_g: 0, custo_unitario: 0 });
+  }
 
-    this.persComposicao.push({
-      ingrediente_id: ing.id,
-      ingrediente_nome: ing.nome,
-      quantidade_g: this.novoIngredienteQtd,
-      custo_unitario: +ing.custo_unitario,
-    });
-    this.novoIngredienteId = null;
-    this.novoIngredienteQtd = 0;
+  setIngrediente(index: number, ingredienteId: string | null): void {
+    const row = this.persComposicao[index];
+    if (!ingredienteId) {
+      row.ingrediente_id = null;
+      row.ingrediente_nome = '';
+      row.custo_unitario = 0;
+      return;
+    }
+    const ing = this.ingredientes.find(i => i.id === ingredienteId);
+    if (!ing) return;
+    row.ingrediente_id = ing.id;
+    row.ingrediente_nome = ing.nome;
+    row.custo_unitario = +ing.custo_unitario;
   }
 
   removerIngredienteTemp(index: number): void {
     this.persComposicao.splice(index, 1);
+    if (this.persComposicao.length === 0) {
+      this.persComposicao.push({ ingrediente_id: null, ingrediente_nome: '', quantidade_g: 0, custo_unitario: 0 });
+    }
   }
 
-  get ingredientesDisponiveis(): Ingrediente[] {
-    const usados = new Set(this.persComposicao.map(c => c.ingrediente_id));
+  ingredientesDisponiveisPara(currentId: string | null): Ingrediente[] {
+    const usados = new Set(
+      this.persComposicao.map(c => c.ingrediente_id).filter(id => id && id !== currentId)
+    );
     return this.ingredientes.filter(i => !usados.has(i.id));
+  }
+
+  get persComposicaoValida(): boolean {
+    return this.persComposicao.some(c => c.ingrediente_id && c.quantidade_g > 0);
   }
 
   get persCustoTotal(): number {
@@ -212,23 +227,25 @@ export class PedidoDetailComponent implements OnInit {
   }
 
   adicionarItemPersonalizado(): void {
-    if (!this.pedido || !this.persNome || this.persComposicao.length === 0) return;
+    if (!this.pedido || !this.persNome || !this.persComposicaoValida) return;
 
     const item: any = {
       tipo: TipoItem.PERSONALIZADO,
       nome: this.persNome,
       quantidade: this.persQuantidade,
       tipo_refeicao: this.persTipoRefeicao,
-      composicao: this.persComposicao.map(c => ({
-        ingrediente_id: c.ingrediente_id,
-        quantidade_g: c.quantidade_g,
-      })),
+      composicao: this.persComposicao
+        .filter(c => c.ingrediente_id && c.quantidade_g > 0)
+        .map(c => ({
+          ingrediente_id: c.ingrediente_id,
+          quantidade_g: c.quantidade_g,
+        })),
     };
 
     this.service.adicionarItem(this.pedido.id, item).subscribe({
       next: (data) => {
         this.pedido = data;
-        this.showItemDialog = false;
+        this.showItemBuilder = false;
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Item personalizado adicionado' });
       },
       error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao adicionar item' }),

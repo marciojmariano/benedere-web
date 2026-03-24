@@ -40,6 +40,7 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: BenederePreset,
         options: {
+          darkModeSelector: '.app-dark-mode',
           cssLayer: {
             name: 'primeng',
             order: 'tailwind-base, primeng, tailwind-utilities',

@@ -25,6 +25,28 @@ body {
   color: #27272a;
 }
 
+// Força tema claro no p-dialog independente do OS
+.p-dialog {
+  background-color: #ffffff !important;
+  color: #27272a !important;
+}
+.p-dialog-header {
+  background-color: #ffffff !important;
+  color: #27272a !important;
+  border-bottom: 1px solid #f4f4f5 !important;
+}
+.p-dialog-content {
+  background-color: #ffffff !important;
+  color: #27272a !important;
+}
+.p-dialog-footer {
+  background-color: #ffffff !important;
+  border-top: 1px solid #f4f4f5 !important;
+}
+.p-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
 // Corrige cor de fundo dos inputs PrimeNG
 .p-inputtext {
   background-color: #ffffff !important;
