@@ -13,7 +13,7 @@ import { MessageService } from 'primeng/api';
 
 import { IngredienteService } from '../../core/services/ingrediente.service';
 import { MarkupService } from '../../core/services/markup.service';
-import { Markup, UnidadeMedida } from '../../core/models';
+import { Markup, TipoIngrediente, UnidadeMedida } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
 
@@ -43,6 +43,11 @@ export class IngredienteFormComponent implements OnInit {
   ingredienteId: string | null = null;
   activeTab = signal(0);
 
+  tiposIngrediente = [
+    { label: 'Insumo (alimentar)', value: TipoIngrediente.INSUMO },
+    { label: 'Embalagem', value: TipoIngrediente.EMBALAGEM },
+  ];
+
   unidades = [
     { label: 'Kg', value: UnidadeMedida.KG },
     { label: 'Gramas (g)', value: UnidadeMedida.G },
@@ -62,6 +67,7 @@ export class IngredienteFormComponent implements OnInit {
     this.ingredienteId = this.route.snapshot.paramMap.get('id');
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(2)]],
+      tipo: [TipoIngrediente.INSUMO, [Validators.required]],
       descricao: [''],
       unidade_medida: [null, [Validators.required]],
       custo_unitario: [null, [Validators.required, Validators.min(0.0001)]],

@@ -40,6 +40,7 @@ export class SidebarComponent {
     { label: 'Produtos', icon: 'pi pi-tag', route: '/produtos' },
     { label: 'Índices de Markup', icon: 'pi pi-list', route: '/indices-markup' },
     { label: 'Markups', icon: 'pi pi-percentage', route: '/markups' },
+    { label: 'Embalagens', icon: 'pi pi-inbox', route: '/embalagens' },
     { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/pedidos' },
   ];
 

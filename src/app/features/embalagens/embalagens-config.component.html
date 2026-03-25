@@ -1,0 +1,161 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="p-6 max-w-4xl mx-auto">
+  <app-page-header
+    title="Regras de Embalagem"
+    subtitle="Configure as faixas de peso para seleção automática da embalagem nos pedidos"
+  >
+    <p-button
+      label="Nova Faixa"
+      icon="pi pi-plus"
+      (onClick)="abrirDialogNovo()"
+    />
+  </app-page-header>
+
+  <!-- Tabela de faixas -->
+  <div class="mt-6 bg-white rounded-xl border border-zinc-200 overflow-hidden">
+    <p-table
+      [value]="faixas"
+      [loading]="carregando"
+      styleClass="p-datatable-sm"
+      [rowHover]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-left">Faixa de Peso</th>
+          <th class="text-left">Embalagem</th>
+          <th class="text-right">Custo</th>
+          <th class="text-center w-28">Ações</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-faixa>
+        <tr>
+          <td>
+            <span class="font-medium text-zinc-800">
+              {{ faixa.peso_min_g }}g – {{ faixa.peso_max_g }}g
+            </span>
+          </td>
+          <td class="text-zinc-700">{{ faixa.ingrediente_embalagem_nome }}</td>
+          <td class="text-right text-zinc-700">
+            {{ faixa.ingrediente_embalagem_custo | currencyBrl }}
+          </td>
+          <td class="text-center">
+            <div class="flex justify-center gap-1">
+              <p-button
+                icon="pi pi-pencil"
+                severity="secondary"
+                size="small"
+                [text]="true"
+                (onClick)="abrirDialogEditar(faixa)"
+                pTooltip="Editar"
+              />
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                size="small"
+                [text]="true"
+                (onClick)="confirmarDesativar(faixa)"
+                pTooltip="Desativar"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center py-8 text-zinc-400">
+            <i class="pi pi-box text-3xl block mb-2 opacity-40"></i>
+            Nenhuma faixa configurada. Clique em "Nova Faixa" para começar.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Dialog: criar/editar faixa -->
+<p-dialog
+  [(visible)]="dialogVisivel"
+  [header]="faixaEditandoId ? 'Editar Faixa' : 'Nova Faixa de Peso'"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [closable]="!salvando"
+>
+  <form [formGroup]="form" class="flex flex-col gap-4 pt-2">
+
+    <!-- Faixa de peso -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-zinc-700">Peso mínimo (g)</label>
+        <p-inputnumber
+          formControlName="peso_min_g"
+          placeholder="Ex: 0"
+          [min]="0"
+          [useGrouping]="false"
+          [class.ng-invalid]="isInvalid('peso_min_g')"
+          styleClass="w-full"
+        />
+        @if (isInvalid('peso_min_g')) {
+          <span class="text-xs text-red-500">Informe o peso mínimo</span>
+        }
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-zinc-700">Peso máximo (g)</label>
+        <p-inputnumber
+          formControlName="peso_max_g"
+          placeholder="Ex: 350"
+          [min]="1"
+          [useGrouping]="false"
+          [class.ng-invalid]="isInvalid('peso_max_g')"
+          styleClass="w-full"
+        />
+        @if (isInvalid('peso_max_g')) {
+          <span class="text-xs text-red-500">Informe o peso máximo</span>
+        }
+      </div>
+    </div>
+
+    <!-- Seleção de embalagem -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium text-zinc-700">Embalagem</label>
+      @if (embalagens.length === 0) {
+        <p class="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <i class="pi pi-exclamation-triangle mr-1"></i>
+          Nenhum ingrediente do tipo "Embalagem" cadastrado.
+          Acesse <strong>Ingredientes</strong> e cadastre um ingrediente com tipo Embalagem.
+        </p>
+      } @else {
+        <p-select
+          formControlName="ingrediente_embalagem_id"
+          [options]="embalagemOptions"
+          placeholder="Selecione a embalagem"
+          [class.ng-invalid]="isInvalid('ingrediente_embalagem_id')"
+          styleClass="w-full"
+          [filter]="true"
+          filterPlaceholder="Buscar embalagem..."
+        />
+        @if (isInvalid('ingrediente_embalagem_id')) {
+          <span class="text-xs text-red-500">Selecione uma embalagem</span>
+        }
+      }
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="dialogVisivel = false"
+      [disabled]="salvando"
+    />
+    <p-button
+      label="Salvar"
+      icon="pi pi-check"
+      (onClick)="salvar()"
+      [loading]="salvando"
+    />
+  </ng-template>
+</p-dialog>

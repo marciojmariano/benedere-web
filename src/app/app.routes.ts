@@ -110,6 +110,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/markups/indice-markup-form.component').then((m) => m.IndiceMarkupFormComponent),
       },
+      // ── Embalagens ─────────────────────────────────────────────────────
+      {
+        path: 'embalagens',
+        loadComponent: () =>
+          import('./features/embalagens/embalagens-config.component').then((m) => m.EmbalagensConfigComponent),
+      },
       // ── Pedidos ────────────────────────────────────────────────────────
       {
         path: 'pedidos',

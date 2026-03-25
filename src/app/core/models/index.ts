@@ -29,6 +29,11 @@ export enum TipoItem {
   PERSONALIZADO = 'personalizado',
 }
 
+export enum TipoIngrediente {
+  INSUMO = 'insumo',
+  EMBALAGEM = 'embalagem',
+}
+
 // ── Labels para exibição ─────────────────────────────────────────────────────
 
 export const TIPO_REFEICAO_LABELS: Record<TipoRefeicao, string> = {
@@ -123,10 +128,23 @@ export interface Markup {
 export interface Ingrediente {
   id: string;
   nome: string;
+  tipo: TipoIngrediente;
   unidade_medida: UnidadeMedida;
   custo_unitario: string;
   descricao: string | null;
   markup_id: string | null;
+  ativo: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FaixaPesoEmbalagem {
+  id: string;
+  peso_min_g: number;
+  peso_max_g: number;
+  ingrediente_embalagem_id: string;
+  ingrediente_embalagem_nome: string;
+  ingrediente_embalagem_custo: number;
   ativo: boolean;
   created_at: string;
   updated_at: string;
@@ -183,6 +201,9 @@ export interface PedidoItem {
   preco_unitario: string;
   preco_total: string;
   composicao: PedidoItemComposicao[];
+  embalagem_ingrediente_id: string | null;
+  embalagem_nome_snapshot: string | null;
+  embalagem_custo_snapshot: string | null;
 }
 
 export interface Pedido {
