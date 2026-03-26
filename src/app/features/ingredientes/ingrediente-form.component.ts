@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -41,8 +41,6 @@ export class IngredienteFormComponent implements OnInit {
   markups: Markup[] = [];
   salvando = false;
   ingredienteId: string | null = null;
-  activeTab = signal(0);
-
   tiposIngrediente = [
     { label: 'Insumo (alimentar)', value: TipoIngrediente.INSUMO },
     { label: 'Embalagem', value: TipoIngrediente.EMBALAGEM },
@@ -85,7 +83,11 @@ export class IngredienteFormComponent implements OnInit {
   }
 
   salvar(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Preencha todos os campos obrigatórios' });
+      return;
+    }
     this.salvando = true;
     const req$ = this.ingredienteId
       ? this.service.atualizar(this.ingredienteId, this.form.value)

@@ -116,6 +116,22 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/embalagens/embalagens-config.component').then((m) => m.EmbalagensConfigComponent),
       },
+      // ── Estoque ────────────────────────────────────────────────────────
+      {
+        path: 'estoque',
+        loadComponent: () =>
+          import('./features/estoque/estoque-list.component').then((m) => m.EstoqueListComponent),
+      },
+      {
+        path: 'estoque/nova-entrada',
+        loadComponent: () =>
+          import('./features/estoque/entrada-form.component').then((m) => m.EntradaFormComponent),
+      },
+      {
+        path: 'estoque/importar',
+        loadComponent: () =>
+          import('./features/estoque/entrada-import.component').then((m) => m.EntradaImportComponent),
+      },
       // ── Pedidos ────────────────────────────────────────────────────────
       {
         path: 'pedidos',

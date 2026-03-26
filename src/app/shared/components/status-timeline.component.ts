@@ -7,10 +7,10 @@ interface TimelineStep {
 }
 
 const ORDER_STEPS: TimelineStep[] = [
-  { key: 'rascunho', label: 'Rascunho', icon: 'pi pi-pencil' },
-  { key: 'aprovado', label: 'Aprovado', icon: 'pi pi-check' },
-  { key: 'em_producao', label: 'Em Produção', icon: 'pi pi-cog' },
-  { key: 'entregue', label: 'Entregue', icon: 'pi pi-truck' },
+  { key: 'RASCUNHO', label: 'Rascunho', icon: 'pi pi-pencil' },
+  { key: 'APROVADO', label: 'Aprovado', icon: 'pi pi-check' },
+  { key: 'EM_PRODUCAO', label: 'Em Produção', icon: 'pi pi-cog' },
+  { key: 'ENTREGUE', label: 'Entregue', icon: 'pi pi-truck' },
 ];
 
 @Component({
@@ -60,19 +60,19 @@ export class StatusTimelineComponent {
   steps = ORDER_STEPS;
 
   private statusOrder = computed(() => {
-    const order: Record<string, number> = { rascunho: 0, aprovado: 1, em_producao: 2, entregue: 3 };
+    const order: Record<string, number> = { RASCUNHO: 0, APROVADO: 1, EM_PRODUCAO: 2, ENTREGUE: 3 };
     return order;
   });
 
-  isCancelled = computed(() => this.currentStatus()?.toLowerCase() === 'cancelado');
+  isCancelled = computed(() => this.currentStatus() === 'CANCELADO');
 
   isCurrent(key: string): boolean {
-    return this.currentStatus()?.toLowerCase() === key;
+    return this.currentStatus() === key;
   }
 
   isCompleted(key: string): boolean {
     const order = this.statusOrder();
-    const currentIdx = order[this.currentStatus()?.toLowerCase()] ?? -1;
+    const currentIdx = order[this.currentStatus()] ?? -1;
     const stepIdx = order[key] ?? -1;
     return stepIdx < currentIdx;
   }

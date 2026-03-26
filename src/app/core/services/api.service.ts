@@ -38,4 +38,8 @@ export class ApiService {
   protected put<T>(path: string, body: unknown): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}${path}`, body);
   }
+
+  protected postFormData<T>(path: string, body: FormData): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}${path}`, body);
+  }
 }

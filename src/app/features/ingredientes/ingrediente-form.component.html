@@ -31,8 +31,8 @@
           </div>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="salvar()">
-          <p-tabs [value]="activeTab()">
+        <form [formGroup]="form">
+          <p-tabs [value]="0">
 
             <!-- Tab 1: Informações -->
             <p-tablist>
@@ -187,6 +187,7 @@
               icon="pi pi-check"
               type="submit"
               [loading]="salvando"
+              (onClick)="salvar()"
             />
           </div>
 
@@ -209,12 +210,12 @@
             </span>
           </div>
 
-          @if (form.get('unidade_medida')?.value === 'kg' || form.get('unidade_medida')?.value === 'g') {
+          @if (form.get('unidade_medida')?.value === 'KG' || form.get('unidade_medida')?.value === 'G') {
             <div class="h-px bg-zinc-100"></div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-zinc-500">Custo por 100g</span>
               <span class="font-semibold text-emerald-600">
-                @if (form.get('unidade_medida')?.value === 'kg') {
+                @if (form.get('unidade_medida')?.value === 'KG') {
                   {{ (form.get('custo_unitario')?.value || 0) / 10 | currencyBrl }}
                 } @else {
                   {{ (form.get('custo_unitario')?.value || 0) * 100 | currencyBrl }}
@@ -223,12 +224,12 @@
             </div>
           }
 
-          @if (form.get('unidade_medida')?.value === 'l' || form.get('unidade_medida')?.value === 'ml') {
+          @if (form.get('unidade_medida')?.value === 'L' || form.get('unidade_medida')?.value === 'ML') {
             <div class="h-px bg-zinc-100"></div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-zinc-500">Custo por 100ml</span>
               <span class="font-semibold text-emerald-600">
-                @if (form.get('unidade_medida')?.value === 'l') {
+                @if (form.get('unidade_medida')?.value === 'L') {
                   {{ (form.get('custo_unitario')?.value || 0) / 10 | currencyBrl }}
                 } @else {
                   {{ (form.get('custo_unitario')?.value || 0) * 100 | currencyBrl }}

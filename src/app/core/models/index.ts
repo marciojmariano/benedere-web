@@ -1,38 +1,60 @@
 // ── Enums ─────────────────────────────────────────────────────────────────────
 
 export enum UnidadeMedida {
-  KG = 'kg',
-  G = 'g',
-  ML = 'ml',
-  L = 'l',
-  UNIDADE = 'unidade',
+  KG = 'KG',
+  G = 'G',
+  ML = 'ML',
+  L = 'L',
+  UNIDADE = 'UNIDADE',
 }
 
 export enum TipoRefeicao {
-  CAFE_MANHA = 'cafe_manha',
-  LANCHE_MANHA = 'lanche_manha',
-  ALMOCO = 'almoco',
-  LANCHE_TARDE = 'lanche_tarde',
-  JANTAR = 'jantar',
+  CAFE_MANHA = 'CAFE_MANHA',
+  LANCHE_MANHA = 'LANCHE_MANHA',
+  ALMOCO = 'ALMOCO',
+  LANCHE_TARDE = 'LANCHE_TARDE',
+  JANTAR = 'JANTAR',
 }
 
 export enum StatusPedido {
-  RASCUNHO = 'rascunho',
-  APROVADO = 'aprovado',
-  EM_PRODUCAO = 'em_producao',
-  ENTREGUE = 'entregue',
-  CANCELADO = 'cancelado',
+  RASCUNHO = 'RASCUNHO',
+  APROVADO = 'APROVADO',
+  EM_PRODUCAO = 'EM_PRODUCAO',
+  ENTREGUE = 'ENTREGUE',
+  CANCELADO = 'CANCELADO',
 }
 
 export enum TipoItem {
-  SERIE = 'serie',
-  PERSONALIZADO = 'personalizado',
+  SERIE = 'SERIE',
+  PERSONALIZADO = 'PERSONALIZADO',
 }
 
 export enum TipoIngrediente {
-  INSUMO = 'insumo',
-  EMBALAGEM = 'embalagem',
+  INSUMO = 'INSUMO',
+  EMBALAGEM = 'EMBALAGEM',
 }
+
+export enum TipoMovimentacao {
+  COMPRA = 'COMPRA',
+  ENTRADA_PRODUCAO = 'ENTRADA_PRODUCAO',
+  AJUSTE_ENTRADA = 'AJUSTE_ENTRADA',
+  VENDA_DEVOLUCAO = 'VENDA_DEVOLUCAO',
+  VENDA = 'VENDA',
+  SAIDA_PRODUCAO = 'SAIDA_PRODUCAO',
+  AJUSTE_SAIDA = 'AJUSTE_SAIDA',
+  COMPRA_DEVOLUCAO = 'COMPRA_DEVOLUCAO',
+}
+
+export const TIPO_MOVIMENTACAO_LABELS: Record<TipoMovimentacao, string> = {
+  [TipoMovimentacao.COMPRA]: 'Compra',
+  [TipoMovimentacao.ENTRADA_PRODUCAO]: 'Entrada Produção',
+  [TipoMovimentacao.AJUSTE_ENTRADA]: 'Ajuste Entrada',
+  [TipoMovimentacao.VENDA_DEVOLUCAO]: 'Devolução de Venda',
+  [TipoMovimentacao.VENDA]: 'Venda',
+  [TipoMovimentacao.SAIDA_PRODUCAO]: 'Saída Produção',
+  [TipoMovimentacao.AJUSTE_SAIDA]: 'Ajuste Saída',
+  [TipoMovimentacao.COMPRA_DEVOLUCAO]: 'Devolução de Compra',
+};
 
 // ── Labels para exibição ─────────────────────────────────────────────────────
 
@@ -131,11 +153,44 @@ export interface Ingrediente {
   tipo: TipoIngrediente;
   unidade_medida: UnidadeMedida;
   custo_unitario: string;
+  saldo_atual: string;
   descricao: string | null;
   markup_id: string | null;
   ativo: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface MovimentacaoEstoque {
+  id: string;
+  ingrediente_id: string;
+  ingrediente_nome: string;
+  tipo: TipoMovimentacao;
+  quantidade: string;
+  preco_unitario_custo: string;
+  data_movimentacao: string;
+  observacoes: string | null;
+  created_at: string;
+}
+
+export interface ImportacaoLinhaErro {
+  linha: number;
+  ingrediente_nome: string;
+  mensagem: string;
+}
+
+export interface ImportacaoEstoqueResponse {
+  total_linhas: number;
+  importadas: number;
+  erros: ImportacaoLinhaErro[];
+}
+
+export interface EntradaEstoqueCreate {
+  ingrediente_id: string;
+  quantidade: number;
+  preco_unitario_custo: number;
+  data_movimentacao: string;
+  observacoes?: string | null;
 }
 
 export interface FaixaPesoEmbalagem {

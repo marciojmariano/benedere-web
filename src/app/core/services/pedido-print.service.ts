@@ -40,7 +40,7 @@ export class PedidoPrintService {
         <tr>
           <td>
             <span class="item-nome">${item.nome_snapshot}</span>
-            ${item.tipo === 'personalizado' ? '<span class="badge badge-violet">Personalizado</span>' : '<span class="badge badge-sky">Série</span>'}
+            ${item.tipo === 'PERSONALIZADO' ? '<span class="badge badge-violet">Personalizado</span>' : '<span class="badge badge-sky">Série</span>'}
             ${tipoLabel ? `<span class="badge badge-zinc">${tipoLabel}</span>` : ''}
           </td>
           <td class="center">${item.quantidade}</td>

@@ -1,0 +1,109 @@
+<div>
+  <p-toast />
+
+  <app-page-header title="Nova Entrada de Estoque" subtitle="Registre a compra de um ingrediente">
+    <p-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" (onClick)="voltar()" />
+  </app-page-header>
+
+  <div class="max-w-2xl">
+    <div class="bg-white rounded-2xl shadow-sm border border-zinc-100 p-6">
+      <form [formGroup]="form">
+
+        <!-- Ingrediente (lookup) -->
+        <div class="mb-5">
+          <label class="block text-sm font-medium text-zinc-700 mb-1">
+            Ingrediente <span class="text-red-500">*</span>
+          </label>
+          <p-autocomplete
+            [(ngModel)]="ingredienteSelecionado"
+            [ngModelOptions]="{ standalone: true }"
+            [suggestions]="sugestoesIngredientes()"
+            (completeMethod)="buscarIngredientes($event)"
+            field="nome"
+            placeholder="Digite para buscar..."
+            [forceSelection]="true"
+            [dropdown]="true"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+            <ng-template let-ingrediente pTemplate="item">
+              <div class="flex justify-between items-center gap-4">
+                <span class="font-medium">{{ ingrediente.nome }}</span>
+                <span class="text-xs text-zinc-400 uppercase">{{ ingrediente.unidade_medida }}</span>
+              </div>
+            </ng-template>
+          </p-autocomplete>
+        </div>
+
+        <!-- Quantidade e Preço -->
+        <div class="grid grid-cols-2 gap-4 mb-5">
+          <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">
+              Quantidade <span class="text-red-500">*</span>
+            </label>
+            <p-inputnumber
+              formControlName="quantidade"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="4"
+              [min]="0.0001"
+              placeholder="0,00"
+              styleClass="w-full"
+              [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('quantidade') }" />
+            @if (isInvalid('quantidade')) {
+              <small class="text-red-500 text-xs">Informe a quantidade</small>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">
+              Preço Unit. de Custo (R$) <span class="text-red-500">*</span>
+            </label>
+            <p-inputnumber
+              formControlName="preco_unitario_custo"
+              mode="currency"
+              currency="BRL"
+              locale="pt-BR"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="4"
+              [min]="0.0001"
+              placeholder="R$ 0,00"
+              styleClass="w-full"
+              [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('preco_unitario_custo') }" />
+            @if (isInvalid('preco_unitario_custo')) {
+              <small class="text-red-500 text-xs">Informe o preço unitário</small>
+            }
+          </div>
+        </div>
+
+        <!-- Data da Entrada -->
+        <div class="mb-5">
+          <label class="block text-sm font-medium text-zinc-700 mb-1">
+            Data da Entrada <span class="text-red-500">*</span>
+          </label>
+          <p-datepicker
+            formControlName="data_movimentacao"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            styleClass="w-full"
+            [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('data_movimentacao') }" />
+          @if (isInvalid('data_movimentacao')) {
+            <small class="text-red-500 text-xs">Informe a data da entrada</small>
+          }
+        </div>
+
+        <!-- Observações -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-zinc-700 mb-1">Observações</label>
+          <textarea pTextarea formControlName="observacoes"
+                    rows="3" placeholder="Observações opcionais..." class="w-full"></textarea>
+        </div>
+
+        <!-- Ações -->
+        <div class="flex justify-end gap-3">
+          <p-button label="Cancelar" severity="secondary" (onClick)="voltar()" />
+          <p-button label="Registrar Entrada" icon="pi pi-check" [loading]="salvando" (onClick)="salvar()" />
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

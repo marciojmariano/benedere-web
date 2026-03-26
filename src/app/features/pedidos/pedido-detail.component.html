@@ -74,7 +74,7 @@
               </div>
 
               <!-- Tab Série -->
-              @if (itemTipo === 'serie') {
+              @if (itemTipo === 'SERIE') {
                 <div class="flex flex-col gap-4">
                   <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Produto do Catálogo *</label>
@@ -116,7 +116,7 @@
               }
 
               <!-- Tab Personalizado -->
-              @if (itemTipo === 'personalizado') {
+              @if (itemTipo === 'PERSONALIZADO') {
                 <div class="flex flex-col gap-4">
                   <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Nome da Marmita *</label>
@@ -252,10 +252,10 @@
                 <div class="flex items-center gap-2 flex-wrap mb-1">
                   <span class="font-semibold text-zinc-800">{{ item.nome_snapshot }}</span>
                   <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ring-1"
-                        [class]="item.tipo === 'serie'
+                        [class]="item.tipo === 'SERIE'
                           ? 'bg-sky-50 text-sky-600 ring-sky-200'
                           : 'bg-violet-50 text-violet-600 ring-violet-200'">
-                    {{ item.tipo === 'serie' ? 'Série' : 'Personalizado' }}
+                    {{ item.tipo === 'SERIE' ? 'Série' : 'Personalizado' }}
                   </span>
                   @if (item.tipo_refeicao) {
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600">
@@ -376,26 +376,26 @@
           <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-5 space-y-2">
             <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">Ações</p>
 
-            @if (pedido.status === 'rascunho') {
+            @if (pedido.status === 'RASCUNHO') {
               <button
                 class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
-                (click)="mudarStatus($any('aprovado'))"
+                (click)="mudarStatus($any('APROVADO'))"
               >
                 <i class="pi pi-check"></i>Aprovar Pedido
               </button>
             }
-            @if (pedido.status === 'aprovado') {
+            @if (pedido.status === 'APROVADO') {
               <button
                 class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-violet-500 text-white hover:bg-violet-600 transition-colors"
-                (click)="mudarStatus($any('em_producao'))"
+                (click)="mudarStatus($any('EM_PRODUCAO'))"
               >
                 <i class="pi pi-cog"></i>Iniciar Produção
               </button>
             }
-            @if (pedido.status === 'em_producao') {
+            @if (pedido.status === 'EM_PRODUCAO') {
               <button
                 class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-teal-500 text-white hover:bg-teal-600 transition-colors"
-                (click)="mudarStatus($any('entregue'))"
+                (click)="mudarStatus($any('ENTREGUE'))"
               >
                 <i class="pi pi-truck"></i>Marcar Entregue
               </button>
@@ -411,7 +411,7 @@
 
         @if (isFinalizado) {
           <div class="bg-zinc-50 rounded-2xl border border-zinc-100 p-5 text-center">
-            @if (pedido.status === 'entregue') {
+            @if (pedido.status === 'ENTREGUE') {
               <i class="pi pi-check-circle text-2xl text-emerald-500 mb-2 block"></i>
               <p class="text-sm font-semibold text-zinc-600">Pedido Entregue</p>
               <p class="text-xs text-zinc-400 mt-1">Este pedido foi finalizado</p>

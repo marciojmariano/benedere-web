@@ -41,6 +41,7 @@ export class SidebarComponent {
     { label: 'Índices de Markup', icon: 'pi pi-list', route: '/indices-markup' },
     { label: 'Markups', icon: 'pi pi-percentage', route: '/markups' },
     { label: 'Embalagens', icon: 'pi pi-inbox', route: '/embalagens' },
+    { label: 'Estoque', icon: 'pi pi-warehouse', route: '/estoque' },
     { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/pedidos' },
   ];
 

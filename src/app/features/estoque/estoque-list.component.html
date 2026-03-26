@@ -1,0 +1,58 @@
+<div>
+  <p-toast />
+
+  <app-page-header title="Estoque" subtitle="Histórico de movimentações de insumos">
+    <p-button label="Importar Excel" icon="pi pi-file-excel" severity="secondary" (onClick)="importarExcel()" />
+    <p-button label="Nova Entrada" icon="pi pi-plus" (onClick)="novaEntrada()" />
+  </app-page-header>
+
+  <!-- Busca -->
+  <div class="mb-4 flex items-center gap-3">
+    <div class="relative ml-auto">
+      <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
+      <input pInputText type="text" placeholder="Buscar ingrediente..."
+             class="w-64 pl-9"
+             [value]="busca()"
+             (input)="busca.set($any($event.target).value)" />
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-zinc-100">
+    <p-table [value]="movimentacoes()" [loading]="loading" [paginator]="true" [rows]="20"
+             styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Data</th>
+          <th>Ingrediente</th>
+          <th>Tipo</th>
+          <th class="text-right">Quantidade</th>
+          <th class="text-right">Custo Unit.</th>
+          <th class="text-right">Total</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-mov>
+        <tr>
+          <td>{{ mov.data_movimentacao | date:'dd/MM/yyyy' }}</td>
+          <td class="font-medium">{{ mov.ingrediente_nome }}</td>
+          <td>
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+              {{ tipoLabel(mov.tipo) }}
+            </span>
+          </td>
+          <td class="text-right tabular-nums">{{ mov.quantidade | number:'1.2-4' }}</td>
+          <td class="text-right tabular-nums">{{ mov.preco_unitario_custo | currencyBrl }}</td>
+          <td class="text-right tabular-nums font-semibold">
+            {{ (+mov.quantidade * +mov.preco_unitario_custo) | currencyBrl }}
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center py-8 text-zinc-400">
+            Nenhuma movimentação registrada.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

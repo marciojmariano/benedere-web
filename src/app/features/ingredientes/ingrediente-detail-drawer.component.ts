@@ -117,18 +117,18 @@ export class IngredienteDetailDrawerComponent {
   unidadeLabel = computed(() => {
     const u = this.ingrediente()?.unidade_medida;
     const map: Record<string, string> = {
-      kg: 'por quilograma',
-      g: 'por grama',
-      l: 'por litro',
-      ml: 'por mililitro',
-      unidade: 'por unidade',
+      KG: 'por quilograma',
+      G: 'por grama',
+      L: 'por litro',
+      ML: 'por mililitro',
+      UNIDADE: 'por unidade',
     };
     return map[u || ''] || '';
   });
 
   mostrarConversoes = computed(() => {
     const u = this.ingrediente()?.unidade_medida;
-    return u === 'kg' || u === 'g' || u === 'l' || u === 'ml';
+    return u === 'KG' || u === 'G' || u === 'L' || u === 'ML';
   });
 
   conversoes = computed(() => {
@@ -137,28 +137,28 @@ export class IngredienteDetailDrawerComponent {
     const custo = +ing.custo_unitario;
     const u = ing.unidade_medida;
 
-    if (u === 'kg') {
+    if (u === 'KG') {
       return [
         { label: 'Custo por 100g', valor: custo / 10 },
         { label: 'Custo por 500g', valor: custo / 2 },
         { label: 'Custo por 200g', valor: custo / 5 },
       ];
     }
-    if (u === 'g') {
+    if (u === 'G') {
       return [
         { label: 'Custo por 100g', valor: custo * 100 },
         { label: 'Custo por 500g', valor: custo * 500 },
         { label: 'Custo por 1kg', valor: custo * 1000 },
       ];
     }
-    if (u === 'l') {
+    if (u === 'L') {
       return [
         { label: 'Custo por 100ml', valor: custo / 10 },
         { label: 'Custo por 250ml', valor: custo / 4 },
         { label: 'Custo por 500ml', valor: custo / 2 },
       ];
     }
-    if (u === 'ml') {
+    if (u === 'ML') {
       return [
         { label: 'Custo por 100ml', valor: custo * 100 },
         { label: 'Custo por 500ml', valor: custo * 500 },
