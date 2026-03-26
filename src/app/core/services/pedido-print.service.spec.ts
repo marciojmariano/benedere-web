@@ -44,6 +44,9 @@ const mockPedido: Pedido = {
         { id: 'comp1', ingrediente_id: 'ing1', ingrediente_nome_snap: 'Frango', quantidade_g: '150', custo_kg_snapshot: '25.00', kcal_snapshot: '0' },
         { id: 'comp2', ingrediente_id: 'ing2', ingrediente_nome_snap: 'Arroz Integral', quantidade_g: '120', custo_kg_snapshot: '8.00', kcal_snapshot: '0' },
       ],
+      embalagem_ingrediente_id: null,
+      embalagem_nome_snapshot: null,
+      embalagem_custo_snapshot: null,
     },
     {
       id: 'i2',
@@ -55,6 +58,9 @@ const mockPedido: Pedido = {
       preco_unitario: '38.00',
       preco_total: '38.00',
       composicao: [],
+      embalagem_ingrediente_id: null,
+      embalagem_nome_snapshot: null,
+      embalagem_custo_snapshot: null,
     },
   ],
 };

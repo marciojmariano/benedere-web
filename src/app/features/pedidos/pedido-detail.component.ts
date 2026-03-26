@@ -197,7 +197,7 @@ export class PedidoDetailComponent implements OnInit {
     if (!ing) return;
     row.ingrediente_id = ing.id;
     row.ingrediente_nome = ing.nome;
-    row.custo_unitario = +ing.custo_unitario;
+    row.custo_unitario = +(ing.custo_calculado ?? ing.custo_unitario);
   }
 
   removerIngredienteTemp(index: number): void {

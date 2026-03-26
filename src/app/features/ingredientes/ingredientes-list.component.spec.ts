@@ -6,16 +6,21 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { IngredientesListComponent } from './ingredientes-list.component';
 import { IngredienteService } from '../../core/services/ingrediente.service';
-import { Ingrediente, UnidadeMedida } from '../../core/models/index';
+import { Ingrediente, TipoIngrediente, UnidadeMedida } from '../../core/models/index';
 
 const makeIngrediente = (partial: Partial<Ingrediente>): Ingrediente => ({
   id: '1',
   nome: 'Frango',
+  tipo: TipoIngrediente.INSUMO,
   unidade_medida: UnidadeMedida.KG,
   custo_unitario: '25.00',
+  saldo_atual: '0.0000',
   descricao: null,
   markup_id: null,
   ativo: true,
+  estrategia_custo: null,
+  periodo_dias_custo_medio: null,
+  custo_calculado: null,
   created_at: '2026-01-01T00:00:00',
   updated_at: '2026-01-01T00:00:00',
   ...partial,

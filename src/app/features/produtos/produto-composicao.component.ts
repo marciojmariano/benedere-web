@@ -116,7 +116,8 @@ export class ProdutoComposicaoComponent implements OnInit {
   }
 
   getCusto(ingredienteId: string): number {
-    return +(this.ingredientes().find(i => i.id === ingredienteId)?.custo_unitario ?? 0);
+    const ing = this.ingredientes().find(i => i.id === ingredienteId);
+    return ing ? +(ing.custo_calculado ?? ing.custo_unitario) : 0;
   }
 
   calcularCustoItem(ingredienteId: string, quantidadeG: number): number {

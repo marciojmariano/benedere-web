@@ -35,8 +35,8 @@ import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
 
           <!-- Custo principal -->
           <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-2xl p-5">
-            <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">Custo Unitário</p>
-            <p class="text-3xl font-bold text-emerald-700">{{ ingrediente()!.custo_unitario | currencyBrl }}</p>
+            <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">Custo Efetivo</p>
+            <p class="text-3xl font-bold text-emerald-700">{{ +(ingrediente()!.custo_calculado ?? ingrediente()!.custo_unitario) | currencyBrl }}</p>
             <p class="text-sm text-emerald-600 mt-0.5">{{ unidadeLabel() }}</p>
           </div>
 
@@ -134,7 +134,7 @@ export class IngredienteDetailDrawerComponent {
   conversoes = computed(() => {
     const ing = this.ingrediente();
     if (!ing) return [];
-    const custo = +ing.custo_unitario;
+    const custo = +(ing.custo_calculado ?? ing.custo_unitario);
     const u = ing.unidade_medida;
 
     if (u === 'KG') {

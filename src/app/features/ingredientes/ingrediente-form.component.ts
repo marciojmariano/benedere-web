@@ -13,7 +13,7 @@ import { MessageService } from 'primeng/api';
 
 import { IngredienteService } from '../../core/services/ingrediente.service';
 import { MarkupService } from '../../core/services/markup.service';
-import { Markup, TipoIngrediente, UnidadeMedida } from '../../core/models';
+import { EstrategiaCusto, ESTRATEGIA_CUSTO_OPTIONS, HistoricoCustoItem, Markup, TipoIngrediente, UnidadeMedida } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
 
@@ -41,6 +41,10 @@ export class IngredienteFormComponent implements OnInit {
   markups: Markup[] = [];
   salvando = false;
   ingredienteId: string | null = null;
+  historicoCusto: HistoricoCustoItem[] = [];
+  custoCalculadoBackend: string | null = null;
+  EstrategiaCusto = EstrategiaCusto;
+  estrategiaOptions = ESTRATEGIA_CUSTO_OPTIONS;
   tiposIngrediente = [
     { label: 'Insumo (alimentar)', value: TipoIngrediente.INSUMO },
     { label: 'Embalagem', value: TipoIngrediente.EMBALAGEM },
@@ -70,16 +74,38 @@ export class IngredienteFormComponent implements OnInit {
       unidade_medida: [null, [Validators.required]],
       custo_unitario: [null, [Validators.required, Validators.min(0.0001)]],
       markup_id: [null],
+      estrategia_custo: [null],
+      periodo_dias_custo_medio: [null],
     });
 
     this.markupService.listar().subscribe({ next: (data) => this.markups = data });
 
     if (this.ingredienteId) {
       this.service.buscarPorId(this.ingredienteId).subscribe({
-        next: (data) => this.form.patchValue(data),
+        next: (data) => {
+          this.form.patchValue(data);
+          this.custoCalculadoBackend = data.custo_calculado;
+        },
         error: () => this.voltar(),
       });
+      this.service.buscarHistoricoCusto(this.ingredienteId, 30).subscribe({
+        next: (data) => this.historicoCusto = data,
+      });
     }
+  }
+
+  get estrategiaSelecionada(): EstrategiaCusto | null {
+    return this.form.get('estrategia_custo')?.value ?? null;
+  }
+
+  get mostrarPeriodoDias(): boolean {
+    return this.estrategiaSelecionada === EstrategiaCusto.MEDIA_PONDERADA_PERIODO;
+  }
+
+  get custoLabel(): string {
+    return this.estrategiaSelecionada && this.estrategiaSelecionada !== EstrategiaCusto.MANUAL
+      ? 'Custo Manual (Fallback)'
+      : this.getCustoLabel();
   }
 
   salvar(): void {

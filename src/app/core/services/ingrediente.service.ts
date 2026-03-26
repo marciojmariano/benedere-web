@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from './api.service';
-import { Ingrediente } from '../models';
+import { HistoricoCustoItem, Ingrediente } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -27,5 +27,9 @@ export class IngredienteService extends ApiService {
 
   desativar(id: string): Observable<void> {
     return this.delete<void>(`/ingredientes/${id}`);
+  }
+
+  buscarHistoricoCusto(id: string, limit = 30): Observable<HistoricoCustoItem[]> {
+    return this.get<HistoricoCustoItem[]>(`/ingredientes/${id}/historico-custo`, { limit });
   }
 }

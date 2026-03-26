@@ -37,7 +37,7 @@
         <tr>
           <th pSortableColumn="nome">Nome <p-sortIcon field="nome" /></th>
           <th>Unidade</th>
-          <th pSortableColumn="custo_unitario">Custo Unitário <p-sortIcon field="custo_unitario" /></th>
+          <th pSortableColumn="custo_unitario">Custo Efetivo <p-sortIcon field="custo_unitario" /></th>
           <th>Status</th>
           <th style="width: 120px">Ações</th>
         </tr>
@@ -50,7 +50,7 @@
               {{ i.unidade_medida }}
             </span>
           </td>
-          <td class="font-medium text-emerald-600">{{ i.custo_unitario | currencyBrl }}</td>
+          <td class="font-medium text-emerald-600">{{ +(i.custo_calculado ?? i.custo_unitario) | currencyBrl }}</td>
           <td><app-status-badge [status]="i.ativo ? 'ativo' : 'inativo'" /></td>
           <td>
             <div class="flex gap-1" (click)="$event.stopPropagation()">

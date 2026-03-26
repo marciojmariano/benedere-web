@@ -34,6 +34,27 @@ export enum TipoIngrediente {
   EMBALAGEM = 'EMBALAGEM',
 }
 
+export enum EstrategiaCusto {
+  MANUAL = 'MANUAL',
+  ULTIMA_COMPRA = 'ULTIMA_COMPRA',
+  MEDIA_PONDERADA_TOTAL = 'MEDIA_PONDERADA_TOTAL',
+  MEDIA_PONDERADA_PERIODO = 'MEDIA_PONDERADA_PERIODO',
+}
+
+export const ESTRATEGIA_CUSTO_LABELS: Record<EstrategiaCusto, string> = {
+  [EstrategiaCusto.MANUAL]: 'Informado Manualmente',
+  [EstrategiaCusto.ULTIMA_COMPRA]: 'Valor da Última Compra',
+  [EstrategiaCusto.MEDIA_PONDERADA_TOTAL]: 'Custo Médio Ponderado (Total)',
+  [EstrategiaCusto.MEDIA_PONDERADA_PERIODO]: 'Custo Médio Ponderado (Período)',
+};
+
+export const ESTRATEGIA_CUSTO_OPTIONS = [
+  { value: EstrategiaCusto.MANUAL, label: 'Informado Manualmente' },
+  { value: EstrategiaCusto.ULTIMA_COMPRA, label: 'Valor da Última Compra' },
+  { value: EstrategiaCusto.MEDIA_PONDERADA_TOTAL, label: 'Custo Médio Ponderado (Total)' },
+  { value: EstrategiaCusto.MEDIA_PONDERADA_PERIODO, label: 'Custo Médio Ponderado (Período)' },
+];
+
 export enum TipoMovimentacao {
   COMPRA = 'COMPRA',
   ENTRADA_PRODUCAO = 'ENTRADA_PRODUCAO',
@@ -157,8 +178,18 @@ export interface Ingrediente {
   descricao: string | null;
   markup_id: string | null;
   ativo: boolean;
+  estrategia_custo: EstrategiaCusto | null;
+  periodo_dias_custo_medio: number | null;
+  custo_calculado: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface HistoricoCustoItem {
+  data_movimentacao: string;
+  preco_unitario_custo: string;
+  quantidade: string;
+  custo_medio_acumulado: string;
 }
 
 export interface MovimentacaoEstoque {
