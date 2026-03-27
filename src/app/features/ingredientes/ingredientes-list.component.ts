@@ -33,7 +33,7 @@ export class IngredientesListComponent implements OnInit {
 
   private todosIngredientes: Ingrediente[] = [];
   busca = signal('');
-  unidadeFiltro = signal<UnidadeMedida | null>(null);
+  unidadeFiltro = signal<UnidadeMedida | null>(UnidadeMedida.KG);
   loading = false;
 
   unidades = Object.values(UnidadeMedida);
