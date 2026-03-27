@@ -43,4 +43,8 @@ export class PedidoService extends ApiService {
   removerItem(pedidoId: string, itemId: string): Observable<Pedido> {
     return this.delete<Pedido>(`/pedidos/${pedidoId}/itens/${itemId}`);
   }
+
+  duplicar(id: string): Observable<Pedido> {
+    return this.post<Pedido>(`/pedidos/${id}/duplicar`, {});
+  }
 }

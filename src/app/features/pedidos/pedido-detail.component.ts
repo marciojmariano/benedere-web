@@ -118,9 +118,10 @@ export class PedidoDetailComponent implements OnInit {
 
   mudarStatus(status: StatusPedido): void {
     if (!this.pedido) return;
-    this.service.mudarStatus(this.pedido.id, status).subscribe({
-      next: (data) => {
-        this.pedido = data;
+    const id = this.pedido.id;
+    this.service.mudarStatus(id, status).subscribe({
+      next: () => {
+        this.carregarPedido(id);
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Status atualizado' });
       },
       error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao atualizar status' }),
@@ -138,6 +139,9 @@ export class PedidoDetailComponent implements OnInit {
   }
 
   get isRascunho(): boolean { return this.pedido?.status === StatusPedido.RASCUNHO; }
+  get isEditavel(): boolean {
+    return this.pedido?.status === StatusPedido.RASCUNHO || this.pedido?.status === StatusPedido.APROVADO;
+  }
   get isFinalizado(): boolean {
     return this.pedido?.status === StatusPedido.ENTREGUE || this.pedido?.status === StatusPedido.CANCELADO;
   }
@@ -291,6 +295,17 @@ export class PedidoDetailComponent implements OnInit {
         detail: 'Permita pop-ups para imprimir o pedido',
       });
     }
+  }
+
+  duplicarPedido(): void {
+    if (!this.pedido) return;
+    this.service.duplicar(this.pedido.id).subscribe({
+      next: (novo) => {
+        this.messageService.add({ severity: 'success', summary: 'Duplicado', detail: `Pedido ${novo.numero} criado como rascunho` });
+        setTimeout(() => this.router.navigate(['/pedidos', novo.id]), 800);
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao duplicar pedido' }),
+    });
   }
 
   voltar(): void { this.router.navigate(['/pedidos']); }

@@ -11,6 +11,7 @@
   @if (pedido) {
     <app-page-header [title]="'Pedido ' + pedido.numero" subtitle="Detalhes e itens do pedido">
       <p-button label="Voltar" icon="pi pi-arrow-left" [text]="true" severity="secondary" (onClick)="voltar()" />
+      <p-button label="Duplicar" icon="pi pi-copy" [outlined]="true" severity="secondary" (onClick)="duplicarPedido()" />
       <p-button label="Imprimir" icon="pi pi-print" [outlined]="true" (onClick)="imprimirPedido()" />
     </app-page-header>
 
@@ -33,7 +34,7 @@
               <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-500">{{ pedido.itens.length }}</span>
             }
           </h3>
-          @if (isRascunho && !showItemBuilder) {
+          @if (isEditavel && !showItemBuilder) {
             <button
               class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
               (click)="abrirItemBuilder()"
@@ -238,7 +239,7 @@
           <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-200 p-12 text-center">
             <i class="pi pi-box text-4xl text-zinc-300 mb-3 block"></i>
             <p class="text-zinc-400 font-medium">Nenhum item adicionado</p>
-            @if (isRascunho) {
+            @if (isEditavel) {
               <p class="text-zinc-300 text-sm mt-1">Clique em "Adicionar Item" para começar</p>
             }
           </div>
@@ -305,7 +306,7 @@
               }
             </div>
 
-            @if (isRascunho) {
+            @if (isEditavel) {
               <div class="mt-3 pt-3 border-t border-zinc-100 flex justify-end">
                 <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-500 hover:bg-rose-50 transition-colors"
@@ -391,6 +392,12 @@
               >
                 <i class="pi pi-cog"></i>Iniciar Produção
               </button>
+              <button
+                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-zinc-200 text-zinc-500 hover:bg-zinc-50 transition-colors"
+                (click)="mudarStatus($any('RASCUNHO'))"
+              >
+                <i class="pi pi-undo"></i>Voltar para Rascunho
+              </button>
             }
             @if (pedido.status === 'EM_PRODUCAO') {
               <button
@@ -398,6 +405,12 @@
                 (click)="mudarStatus($any('ENTREGUE'))"
               >
                 <i class="pi pi-truck"></i>Marcar Entregue
+              </button>
+              <button
+                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-zinc-200 text-zinc-500 hover:bg-zinc-50 transition-colors"
+                (click)="mudarStatus($any('APROVADO'))"
+              >
+                <i class="pi pi-undo"></i>Voltar para Aprovado
               </button>
             }
             <button

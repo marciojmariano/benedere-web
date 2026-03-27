@@ -20,20 +20,30 @@
 
   <!-- Menu -->
   <nav class="flex-1 px-2 py-4 overflow-y-auto">
-    @for (item of menuItems; track item.route) {
-      <div
-        [routerLink]="item.route"
-        routerLinkActive="active-link"
-        [routerLinkActiveOptions]="item.route === '/' ? { exact: true } : { exact: false }"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition-all duration-200 cursor-pointer"
-        [class.justify-center]="collapsed()"
-        [attr.title]="collapsed() ? item.label : null"
-      >
-        <i [class]="item.icon + ' text-lg shrink-0'"></i>
-        @if (!collapsed()) {
-          <span class="text-sm font-medium whitespace-nowrap">{{ item.label }}</span>
-        }
-      </div>
+    @for (group of menuGroups; track group.label) {
+      @if (group.label && !collapsed()) {
+        <p class="px-3 pt-3 pb-1 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+          {{ group.label }}
+        </p>
+      }
+      @if (group.label && collapsed()) {
+        <div class="border-t border-zinc-700/50 my-2"></div>
+      }
+      @for (item of group.items; track item.route) {
+        <div
+          [routerLink]="item.route"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="item.route === '/' ? { exact: true } : { exact: false }"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition-all duration-200 cursor-pointer"
+          [class.justify-center]="collapsed()"
+          [attr.title]="collapsed() ? item.label : null"
+        >
+          <i [class]="item.icon + ' text-lg shrink-0'"></i>
+          @if (!collapsed()) {
+            <span class="text-sm font-medium whitespace-nowrap">{{ item.label }}</span>
+          }
+        </div>
+      }
     }
   </nav>
 
