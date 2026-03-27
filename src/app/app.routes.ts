@@ -116,6 +116,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/embalagens/embalagens-config.component').then((m) => m.EmbalagensConfigComponent),
       },
+      // ── Etiquetas ──────────────────────────────────────────────────────
+      {
+        path: 'etiquetas',
+        loadComponent: () =>
+          import('./features/etiquetas/etiqueta-editor.component').then((m) => m.EtiquetaEditorComponent),
+      },
       // ── Estoque ────────────────────────────────────────────────────────
       {
         path: 'estoque',

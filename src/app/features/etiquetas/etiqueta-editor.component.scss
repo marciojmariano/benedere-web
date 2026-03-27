@@ -1,0 +1,98 @@
+// Chip de placeholder simples no editor
+:host ::ng-deep .ql-placeholder {
+  display: inline-flex;
+  align-items: center;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #7dd3fc;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: default;
+  user-select: none;
+  vertical-align: middle;
+  line-height: 1.6;
+}
+
+// Bloco de ingredientes no editor
+:host ::ng-deep .ql-ingredientes-placeholder {
+  display: block;
+  margin: 6px 0;
+
+  .ingredientes-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0fdf4;
+    border: 1.5px dashed #059669;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #065f46;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: default;
+    user-select: none;
+
+    small {
+      font-weight: 400;
+      color: #6b7280;
+    }
+  }
+}
+
+// Container do preview dimensionado
+.label-preview-container {
+  border: 1px dashed #d4d4d8;
+  padding: 4mm;
+  overflow: hidden;
+  background: white;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  :host ::ng-deep .ingredientes-table {
+    td {
+      padding: 1px 4px;
+      border-bottom: 0.5px solid #e4e4e7;
+    }
+  }
+}
+
+// Botões de inserção de placeholder
+.placeholder-btn {
+  display: inline-flex;
+  align-items: center;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #dbeafe;
+  }
+}
+
+.ingredientes-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0fdf4;
+  color: #059669;
+  border: 1.5px dashed #059669;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #dcfce7;
+  }
+}

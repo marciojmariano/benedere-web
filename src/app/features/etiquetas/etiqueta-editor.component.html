@@ -1,0 +1,161 @@
+<p-toast />
+
+<app-page-header
+  title="Editor de Etiquetas"
+  subtitle="Customize o layout da etiqueta colada nas marmitas"
+>
+  <p-button
+    label="Preview"
+    icon="pi pi-eye"
+    [text]="true"
+    severity="secondary"
+    (onClick)="gerarPreview()"
+  />
+  <p-button
+    label="Salvar"
+    icon="pi pi-save"
+    [loading]="salvando"
+    (onClick)="salvar()"
+  />
+</app-page-header>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+
+  <!-- Coluna Principal: Editor -->
+  <div class="lg:col-span-2 space-y-4">
+
+    <!-- Toolbar customizada do Quill -->
+    <div id="etiqueta-toolbar" class="border border-zinc-200 rounded-t-lg bg-white">
+      <span class="ql-formats">
+        <button class="ql-bold" title="Negrito"></button>
+        <button class="ql-italic" title="Itálico"></button>
+        <button class="ql-underline" title="Sublinhado"></button>
+      </span>
+      <span class="ql-formats">
+        <select class="ql-size" title="Tamanho da fonte">
+          <option value="8px">8pt</option>
+          <option value="9px">9pt</option>
+          <option value="10px">10pt</option>
+          <option value="11px">11pt</option>
+          <option selected value="12px">12pt</option>
+          <option value="14px">14pt</option>
+          <option value="16px">16pt</option>
+          <option value="18px">18pt</option>
+          <option value="20px">20pt</option>
+        </select>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-align" value="" title="Alinhar à esquerda"></button>
+        <button class="ql-align" value="center" title="Centralizar"></button>
+        <button class="ql-align" value="right" title="Alinhar à direita"></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-clean" title="Limpar formatação"></button>
+      </span>
+    </div>
+
+    <!-- Canvas do editor Quill -->
+    <div
+      id="quill-editor-container"
+      class="border border-zinc-200 border-t-0 rounded-b-lg bg-white"
+      style="min-height: 300px"
+    ></div>
+
+    <!-- Seção de Preview (abaixo do editor, visível após clicar Preview) -->
+    @if (safePreviewHtml) {
+      <div id="preview-section" class="bg-white border border-zinc-200 rounded-lg p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-semibold text-zinc-700">
+            <i class="pi pi-eye mr-2 text-zinc-400"></i>
+            Preview com dados de exemplo
+          </h3>
+          <span class="text-xs text-zinc-400">
+            {{ dimensionForm.value.largura_mm }}mm × {{ dimensionForm.value.altura_mm }}mm
+          </span>
+        </div>
+        <div class="flex justify-center">
+          <div
+            class="label-preview-container"
+            [style]="previewStyle"
+            [innerHTML]="safePreviewHtml"
+          ></div>
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- Coluna Lateral: Dimensões + Placeholders -->
+  <div class="space-y-5">
+
+    <!-- Dimensões da etiqueta -->
+    <div class="bg-white border border-zinc-200 rounded-lg p-4">
+      <h3 class="text-sm font-semibold text-zinc-700 mb-3">
+        <i class="pi pi-ruler mr-1 text-zinc-400"></i>
+        Dimensões da Etiqueta
+      </h3>
+      <form [formGroup]="dimensionForm" class="space-y-3">
+        <div>
+          <label class="text-xs text-zinc-500 block mb-1">Largura (mm)</label>
+          <p-inputnumber
+            formControlName="largura_mm"
+            [min]="20" [max]="300"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            styleClass="w-full"
+          />
+        </div>
+        <div>
+          <label class="text-xs text-zinc-500 block mb-1">Altura (mm)</label>
+          <p-inputnumber
+            formControlName="altura_mm"
+            [min]="20" [max]="300"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            styleClass="w-full"
+          />
+        </div>
+      </form>
+    </div>
+
+    <!-- Inserir Placeholders -->
+    <div class="bg-white border border-zinc-200 rounded-lg p-4">
+      <h3 class="text-sm font-semibold text-zinc-700 mb-1">
+        <i class="pi pi-plus-circle mr-1 text-zinc-400"></i>
+        Campos Dinâmicos
+      </h3>
+      <p class="text-xs text-zinc-400 mb-3">Clique para inserir no cursor do editor</p>
+
+      @for (category of categories; track category) {
+        <div class="mb-3">
+          <p class="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{{ category }}</p>
+          <div class="flex flex-wrap gap-2">
+            @for (p of placeholdersByCategory(category); track p.key) {
+              <button
+                type="button"
+                class="placeholder-btn"
+                (click)="inserirPlaceholder(p.key)"
+                [title]="'Exemplo: ' + p.sampleValue"
+              >
+                {{ p.label }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="border-t border-zinc-100 my-3"></div>
+
+      <p class="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">Ingredientes</p>
+      <button
+        type="button"
+        class="ingredientes-btn w-full"
+        (click)="inserirIngredientesTabela()"
+      >
+        <i class="pi pi-list mr-1"></i>
+        Tabela de Ingredientes
+      </button>
+    </div>
+
+  </div>
+</div>

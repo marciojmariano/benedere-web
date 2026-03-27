@@ -120,6 +120,26 @@ export interface Tenant {
   ativo: boolean;
   created_at: string;
   updated_at: string;
+  etiqueta_template_delta?: any | null;
+  etiqueta_html_output?: string | null;
+  etiqueta_largura_mm?: number | null;
+  etiqueta_altura_mm?: number | null;
+}
+
+export interface IngredienteEtiqueta {
+  nome: string;
+  peso_g: number;
+}
+
+export interface EtiquetaData {
+  cliente_nome: string;
+  tipo_refeicao: string;
+  data_fabricacao: string;
+  data_validade: string;
+  empresa_nome: string;
+  empresa_cnpj: string;
+  ingredientes: IngredienteEtiqueta[];
+  [key: string]: any;
 }
 
 export interface Nutricionista {
