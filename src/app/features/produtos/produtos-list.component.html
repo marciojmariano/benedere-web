@@ -7,7 +7,7 @@
   </app-page-header>
 
   <!-- KPI Summary -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+  <div class="grid grid-cols-3 gap-3 mb-5">
     <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
       <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
         <i class="pi pi-shopping-bag text-zinc-500 text-sm"></i>
@@ -35,51 +35,15 @@
         <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ totalInativos }}</p>
       </div>
     </div>
-    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-        <i class="pi pi-tag text-amber-500 text-sm"></i>
-      </div>
-      <div>
-        <p class="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Sem Tipo</p>
-        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ semTipo }}</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filtros por tipo de refeição -->
-  <div class="flex flex-wrap gap-2 mb-4">
-    @for (tipo of tiposRefeicao; track tipo) {
-      <button
-        class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors border"
-        [class]="filtroTipo === tipo
-          ? 'bg-emerald-500 text-white border-emerald-500'
-          : 'bg-white text-zinc-600 border-zinc-200 hover:border-emerald-300 hover:text-emerald-600'"
-        (click)="toggleFiltroTipo(tipo)"
-      >
-        {{ tipoEmojis[tipo] }} {{ tipoRefeicaoLabels[tipo] }}
-      </button>
-    }
-    @if (filtroTipo) {
-      <button
-        class="px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-zinc-600 transition-colors"
-        (click)="filtroTipo = null"
-      >
-        <i class="pi pi-times text-xs mr-1"></i> Limpar
-      </button>
-    }
   </div>
 
   <div class="bg-white rounded-2xl shadow-sm border border-zinc-100">
-    <p-table #dt [value]="produtosFiltrados" [loading]="loading" [paginator]="true" [rows]="10"
+    <p-table #dt [value]="produtos" [loading]="loading" [paginator]="true" [rows]="10"
              [globalFilterFields]="['nome']" styleClass="p-datatable-sm">
       <ng-template pTemplate="caption">
         <div class="flex justify-between items-center">
           <span class="text-sm text-zinc-400">
-            {{ produtosFiltrados.length }} produto{{ produtosFiltrados.length !== 1 ? 's' : '' }}
-            @if (filtroTipo) {
-              &nbsp;&middot;&nbsp;
-              <span class="text-emerald-600 font-semibold">{{ tipoEmojis[filtroTipo] }} {{ tipoRefeicaoLabels[filtroTipo] }}</span>
-            }
+            {{ produtos.length }} produto{{ produtos.length !== 1 ? 's' : '' }}
           </span>
           <div class="relative">
             <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
@@ -91,7 +55,6 @@
       <ng-template pTemplate="header">
         <tr>
           <th pSortableColumn="nome">Nome <p-sortIcon field="nome" /></th>
-          <th>Tipo Refeição</th>
           <th pSortableColumn="peso_total_g">Peso <p-sortIcon field="peso_total_g" /></th>
           <th>Status</th>
           <th style="width: 120px">Ações</th>
@@ -100,15 +63,6 @@
       <ng-template pTemplate="body" let-p>
         <tr class="group">
           <td class="font-medium text-zinc-800">{{ p.nome }}</td>
-          <td>
-            @if (p.tipo_refeicao) {
-              <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
-                {{ getTipoEmoji(p.tipo_refeicao) }} {{ getTipoRefeicaoLabel(p.tipo_refeicao) }}
-              </span>
-            } @else {
-              <span class="text-zinc-300">—</span>
-            }
-          </td>
           <td class="text-zinc-600 tabular-nums">{{ p.peso_total_g }}g</td>
           <td><app-status-badge [status]="p.ativo ? 'ativo' : 'inativo'" /></td>
           <td>
@@ -133,15 +87,11 @@
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5" class="text-center py-12">
+          <td colspan="4" class="text-center py-12">
             <div>
               <i class="pi pi-box text-4xl text-zinc-300 mb-3 block"></i>
               <p class="text-zinc-400 font-medium">Nenhum produto encontrado</p>
-              @if (filtroTipo) {
-                <p class="text-zinc-300 text-sm mt-1">Nenhum produto com tipo "{{ tipoRefeicaoLabels[filtroTipo] }}"</p>
-              } @else {
-                <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro produto clicando em "Novo Produto"</p>
-              }
+              <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro produto clicando em "Novo Produto"</p>
             </div>
           </td>
         </tr>

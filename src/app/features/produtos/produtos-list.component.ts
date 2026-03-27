@@ -9,7 +9,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { ProdutoService } from '../../core/services/produto.service';
-import { Produto, TipoRefeicao, TIPO_REFEICAO_LABELS } from '../../core/models';
+import { Produto } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 
@@ -31,18 +31,6 @@ export class ProdutosListComponent implements OnInit {
 
   produtos: Produto[] = [];
   loading = false;
-  filtroTipo: TipoRefeicao | null = null;
-
-  tipoRefeicaoLabels = TIPO_REFEICAO_LABELS;
-  tiposRefeicao = Object.values(TipoRefeicao);
-
-  tipoEmojis: Record<TipoRefeicao, string> = {
-    [TipoRefeicao.CAFE_MANHA]:   '☕',
-    [TipoRefeicao.LANCHE_MANHA]: '🥐',
-    [TipoRefeicao.ALMOCO]:       '🍽️',
-    [TipoRefeicao.LANCHE_TARDE]: '🥪',
-    [TipoRefeicao.JANTAR]:       '🌙',
-  };
 
   ngOnInit(): void { this.carregar(); }
 
@@ -57,29 +45,11 @@ export class ProdutosListComponent implements OnInit {
     });
   }
 
-  get produtosFiltrados(): Produto[] {
-    if (!this.filtroTipo) return this.produtos;
-    return this.produtos.filter(p => p.tipo_refeicao === this.filtroTipo);
-  }
-
-  toggleFiltroTipo(tipo: TipoRefeicao): void {
-    this.filtroTipo = this.filtroTipo === tipo ? null : tipo;
-  }
-
   get totalAtivos(): number { return this.produtos.filter(p => p.ativo).length; }
   get totalInativos(): number { return this.produtos.filter(p => !p.ativo).length; }
-  get semTipo(): number { return this.produtos.filter(p => !p.tipo_refeicao).length; }
 
   novo(): void { this.router.navigate(['/produtos/novo']); }
   editar(p: Produto): void { this.router.navigate(['/produtos', p.id]); }
-
-  getTipoRefeicaoLabel(tipo: TipoRefeicao | null): string {
-    return tipo ? this.tipoRefeicaoLabels[tipo] : '—';
-  }
-
-  getTipoEmoji(tipo: TipoRefeicao | null): string {
-    return tipo ? this.tipoEmojis[tipo] : '';
-  }
 
   confirmarDesativar(p: Produto): void {
     this.confirmationService.confirm({

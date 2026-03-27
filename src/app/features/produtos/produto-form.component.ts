@@ -4,14 +4,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
 import { ProdutoService } from '../../core/services/produto.service';
 import { IngredienteService } from '../../core/services/ingrediente.service';
-import { Ingrediente, TipoRefeicao, TIPO_REFEICAO_LABELS } from '../../core/models';
+import { Ingrediente } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { ProdutoComposicaoComponent, ComposicaoItem } from './produto-composicao.component';
 
@@ -20,7 +19,7 @@ import { ProdutoComposicaoComponent, ComposicaoItem } from './produto-composicao
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule,
-    SelectModule, TextareaModule, ToastModule,
+    TextareaModule, ToastModule,
     PageHeaderComponent, ProdutoComposicaoComponent,
   ],
   providers: [MessageService],
@@ -45,18 +44,12 @@ export class ProdutoFormComponent implements OnInit {
   isEdicao = false;
   activeTab = 0;
 
-  tiposRefeicao = Object.values(TipoRefeicao).map(v => ({
-    label: TIPO_REFEICAO_LABELS[v],
-    value: v,
-  }));
-
   ngOnInit(): void {
     this.produtoId = this.route.snapshot.paramMap.get('id');
     this.isEdicao = !!this.produtoId;
 
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(2)]],
-      tipo_refeicao: [null],
       descricao: [''],
     });
 
@@ -69,7 +62,6 @@ export class ProdutoFormComponent implements OnInit {
         next: (data) => {
           this.form.patchValue({
             nome: data.nome,
-            tipo_refeicao: data.tipo_refeicao,
             descricao: data.descricao,
           });
           if (data.composicao?.length) {
@@ -132,7 +124,4 @@ export class ProdutoFormComponent implements OnInit {
 
   voltar(): void { this.router.navigate(['/produtos']); }
   isInvalid(campo: string): boolean { const c = this.form.get(campo); return !!(c?.invalid && c?.touched); }
-  getTipoLabel(value: string | null): string {
-    return this.tiposRefeicao.find(t => t.value === value)?.label || '';
-  }
 }

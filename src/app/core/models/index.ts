@@ -252,7 +252,6 @@ export interface ProdutoComposicao {
 export interface Produto {
   id: string;
   nome: string;
-  tipo_refeicao: TipoRefeicao | null;
   peso_total_g: string;
   descricao: string | null;
   ativo: boolean;
