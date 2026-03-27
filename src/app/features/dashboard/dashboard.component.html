@@ -4,14 +4,18 @@
   </div>
 } @else {
   <div>
-    <!-- Header -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-zinc-800">Dashboard</h1>
-      <p class="text-sm text-zinc-400 mt-0.5">Visão geral do seu negócio</p>
+
+    <!-- Header — saudação personalizada -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2">
+        <h1 class="text-2xl font-bold text-zinc-800">{{ saudacao }}, {{ nomeUsuario }}</h1>
+        <span class="text-2xl">👋</span>
+      </div>
+      <p class="text-sm text-zinc-400 mt-1">Aqui está o resumo da sua operação hoje.</p>
     </div>
 
     <!-- KPI Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <app-kpi-card
         icon="pi pi-users"
         [value]="totalClientes"
@@ -38,8 +42,8 @@
       />
     </div>
 
-    <!-- Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Content Grid — 2 colunas (conforme DashRef1) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- Últimos Clientes -->
       <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
@@ -47,7 +51,7 @@
           <h3 class="text-sm font-semibold text-zinc-700">Últimos Clientes</h3>
           <button class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
                   (click)="navigateTo('/clientes')">
-            Ver todos <i class="pi pi-arrow-right text-[10px] ml-1"></i>
+            Ver mais <i class="pi pi-arrow-right text-[10px] ml-1"></i>
           </button>
         </div>
         <div class="divide-y divide-zinc-50">
@@ -62,35 +66,7 @@
             </div>
           }
           @if (ultimosClientes.length === 0) {
-            <div class="px-5 py-8 text-center text-zinc-300 text-sm">Nenhum cliente cadastrado</div>
-          }
-        </div>
-      </div>
-
-      <!-- Pedidos Recentes -->
-      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
-          <h3 class="text-sm font-semibold text-zinc-700">Pedidos Recentes</h3>
-          <button class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
-                  (click)="navigateTo('/pedidos')">
-            Ver todos <i class="pi pi-arrow-right text-[10px] ml-1"></i>
-          </button>
-        </div>
-        <div class="divide-y divide-zinc-50">
-          @for (pedido of pedidosRecentes; track pedido.id) {
-            <div class="flex items-center gap-3 px-5 py-3 hover:bg-zinc-50/50 transition-colors">
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-zinc-700">{{ pedido.numero }}</p>
-                <p class="text-xs text-zinc-400">{{ formatDate(pedido.created_at) }}</p>
-              </div>
-              <div class="text-right">
-                <p class="text-sm font-semibold text-zinc-700">{{ pedido.valor_total | currencyBrl }}</p>
-                <app-status-badge [status]="pedido.status" />
-              </div>
-            </div>
-          }
-          @if (pedidosRecentes.length === 0) {
-            <div class="px-5 py-8 text-center text-zinc-300 text-sm">Nenhum pedido cadastrado</div>
+            <div class="px-5 py-10 text-center text-zinc-300 text-sm">Nenhum cliente cadastrado</div>
           }
         </div>
       </div>
@@ -101,7 +77,7 @@
           <h3 class="text-sm font-semibold text-zinc-700">Nutricionistas</h3>
           <button class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
                   (click)="navigateTo('/nutricionistas')">
-            Ver todos <i class="pi pi-arrow-right text-[10px] ml-1"></i>
+            Ver mais <i class="pi pi-arrow-right text-[10px] ml-1"></i>
           </button>
         </div>
         <div class="divide-y divide-zinc-50">
@@ -116,7 +92,7 @@
             </div>
           }
           @if (nutricionistas.length === 0) {
-            <div class="px-5 py-8 text-center text-zinc-300 text-sm">Nenhuma nutricionista cadastrada</div>
+            <div class="px-5 py-10 text-center text-zinc-300 text-sm">Nenhuma nutricionista cadastrada</div>
           }
         </div>
       </div>

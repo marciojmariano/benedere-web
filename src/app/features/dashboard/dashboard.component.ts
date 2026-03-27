@@ -3,24 +3,25 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
+import { AuthService } from '../../core/services/auth.service';
 import { ClienteService } from '../../core/services/cliente.service';
 import { IngredienteService } from '../../core/services/ingrediente.service';
 import { ProdutoService } from '../../core/services/produto.service';
 import { PedidoService } from '../../core/services/pedido.service';
 import { NutricionistaService } from '../../core/services/nutricionista.service';
-import { Cliente, Ingrediente, Produto, PedidoResumo, Nutricionista, StatusPedido, STATUS_PEDIDO_LABELS } from '../../core/models';
+import { Cliente, Nutricionista, StatusPedido } from '../../core/models';
 import { KpiCardComponent } from '../../shared/components/kpi-card.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 import { AvatarComponent } from '../../shared/components/avatar.component';
-import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, KpiCardComponent, StatusBadgeComponent, AvatarComponent, CurrencyBrlPipe],
+  imports: [CommonModule, KpiCardComponent, StatusBadgeComponent, AvatarComponent],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
+  private authService = inject(AuthService);
   private clienteService = inject(ClienteService);
   private ingredienteService = inject(IngredienteService);
   private produtoService = inject(ProdutoService);
@@ -29,6 +30,7 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
 
   loading = true;
+  nomeUsuario = 'Admin';
 
   // KPIs
   totalClientes = 0;
@@ -38,12 +40,21 @@ export class DashboardComponent implements OnInit {
 
   // Lists
   ultimosClientes: Cliente[] = [];
-  pedidosRecentes: PedidoResumo[] = [];
   nutricionistas: Nutricionista[] = [];
 
-  statusLabels = STATUS_PEDIDO_LABELS;
+  get saudacao(): string {
+    const h = new Date().getHours();
+    if (h < 12) return 'Bom dia';
+    if (h < 18) return 'Boa tarde';
+    return 'Boa noite';
+  }
 
   ngOnInit(): void {
+    this.authService.user$.subscribe(user => {
+      if (user?.given_name) this.nomeUsuario = user.given_name;
+      else if (user?.name) this.nomeUsuario = user.name.split(' ')[0];
+    });
+
     forkJoin({
       clientes: this.clienteService.listar(),
       ingredientes: this.ingredienteService.listar(),
@@ -55,16 +66,13 @@ export class DashboardComponent implements OnInit {
         this.totalClientes = data.clientes.length;
         this.totalIngredientes = data.ingredientes.length;
         this.totalProdutos = data.produtos.length;
+        this.ultimosClientes = data.clientes.slice(0, 6);
+        this.nutricionistas = data.nutricionistas.slice(0, 6);
 
-        this.ultimosClientes = data.clientes.slice(0, 5);
-        this.nutricionistas = data.nutricionistas.slice(0, 4);
-
-        // Pedidos pendentes (não entregues nem cancelados)
         const pendentes = data.pedidos.filter(p =>
           p.status !== StatusPedido.ENTREGUE && p.status !== StatusPedido.CANCELADO
         );
         this.totalPedidosPendentes = pendentes.length;
-        this.pedidosRecentes = data.pedidos.slice(0, 5);
 
         this.loading = false;
       },
@@ -74,9 +82,5 @@ export class DashboardComponent implements OnInit {
 
   navigateTo(path: string): void {
     this.router.navigate([path]);
-  }
-
-  formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('pt-BR');
   }
 }
