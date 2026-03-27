@@ -44,6 +44,7 @@ export class SidebarComponent {
     { label: 'Estoque', icon: 'pi pi-warehouse', route: '/estoque' },
     { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/pedidos' },
     { label: 'Produção', icon: 'pi pi-clipboard', route: '/producao' },
+    { label: 'Montagem', icon: 'pi pi-list-check', route: '/producao/mapa-montagem' },
   ];
 
   toggleCollapse(): void {

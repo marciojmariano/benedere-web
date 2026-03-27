@@ -132,11 +132,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/estoque/entrada-import.component').then((m) => m.EntradaImportComponent),
       },
-      // ── Produção (BOM) ─────────────────────────────────────────────────
+      // ── Produção (BOM + Mapa de Montagem) ──────────────────────────────
       {
         path: 'producao',
         loadComponent: () =>
           import('./features/producao/producao-explosao.component').then((m) => m.ProducaoExplosaoComponent),
+      },
+      {
+        path: 'producao/mapa-montagem',
+        loadComponent: () =>
+          import('./features/producao/mapa-montagem.component').then((m) => m.MapaMontagemComponent),
       },
       // ── Pedidos ────────────────────────────────────────────────────────
       {

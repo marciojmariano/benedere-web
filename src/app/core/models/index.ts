@@ -349,6 +349,47 @@ export interface ExplosaoProducaoResponse {
   pedidos: ExplosaoPedidoDetalhe[];
 }
 
+// ── Mapa de Montagem ─────────────────────────────────────────────────────────
+
+export interface MapaComposicaoItem {
+  ingrediente_nome: string;
+  quantidade_g: string;
+}
+
+export interface MapaItemDetalhe {
+  nome_snapshot: string;
+  tipo_refeicao: TipoRefeicao | null;
+  tipo: TipoItem;
+  quantidade: number;
+  embalagem_nome: string | null;
+  composicao: MapaComposicaoItem[];
+}
+
+export interface MapaPedidoDetalhe {
+  pedido_id: string;
+  pedido_numero: string;
+  data_entrega_prevista: string | null;
+  observacoes: string | null;
+  itens: MapaItemDetalhe[];
+}
+
+export interface MapaClienteGrupo {
+  cliente_id: string;
+  cliente_nome: string;
+  cliente_endereco: string | null;
+  cliente_observacoes: string | null;
+  pedidos: MapaPedidoDetalhe[];
+}
+
+export interface MapaMontagemResponse {
+  periodo_inicio: string;
+  periodo_fim: string;
+  total_clientes: number;
+  total_pedidos: number;
+  total_itens: number;
+  clientes: MapaClienteGrupo[];
+}
+
 // ── Paginação ─────────────────────────────────────────────────────────────────
 
 export interface ApiResponse<T> {

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { ExplosaoProducaoResponse, StatusPedido } from '../models';
+import { ExplosaoProducaoResponse, MapaMontagemResponse, StatusPedido } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ProducaoService {
@@ -27,6 +27,27 @@ export class ProducaoService {
 
     return this.http.get<ExplosaoProducaoResponse>(
       `${this.baseUrl}/producao/explosao`,
+      { params: httpParams },
+    );
+  }
+
+  getMapaMontagem(params: {
+    data_inicio: string;
+    data_fim: string;
+    status?: StatusPedido[];
+    filtro_data?: 'entrega' | 'criacao';
+  }): Observable<MapaMontagemResponse> {
+    let httpParams = new HttpParams()
+      .set('data_inicio', params.data_inicio)
+      .set('data_fim', params.data_fim)
+      .set('filtro_data', params.filtro_data ?? 'entrega');
+
+    (params.status ?? [StatusPedido.APROVADO, StatusPedido.EM_PRODUCAO]).forEach(s => {
+      httpParams = httpParams.append('status', s);
+    });
+
+    return this.http.get<MapaMontagemResponse>(
+      `${this.baseUrl}/producao/mapa-montagem`,
       { params: httpParams },
     );
   }

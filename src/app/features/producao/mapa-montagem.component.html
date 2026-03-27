@@ -1,0 +1,207 @@
+<p-toast />
+
+<app-page-header title="Mapa de Montagem" subtitle="Detalhamento por cliente — composição de cada marmita sem valores">
+  <button
+    pButton
+    icon="pi pi-print"
+    label="Imprimir"
+    class="p-button-outlined"
+    [disabled]="!resultado || carregando"
+    (click)="imprimir()"
+  ></button>
+</app-page-header>
+
+<!-- ── Filtros ────────────────────────────────────────────────────────────── -->
+<div class="bg-white border border-zinc-200 rounded-xl p-4 mb-6">
+  <div class="flex flex-wrap gap-4 items-end">
+    <div class="flex flex-col gap-1 min-w-[160px]">
+      <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Data Início</label>
+      <p-datepicker
+        [(ngModel)]="dataInicio"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        placeholder="DD/MM/AAAA"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1 min-w-[160px]">
+      <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Data Fim</label>
+      <p-datepicker
+        [(ngModel)]="dataFim"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        placeholder="DD/MM/AAAA"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1 min-w-[220px]">
+      <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Status</label>
+      <p-multiselect
+        [(ngModel)]="statusSelecionados"
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecione os status"
+        styleClass="w-full"
+        display="chip"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Filtrar por</label>
+      <div class="flex gap-2">
+        <button pButton
+          [class]="filtroData === 'entrega' ? 'p-button-sm' : 'p-button-sm p-button-outlined'"
+          label="Data de Entrega"
+          (click)="filtroData = 'entrega'"
+        ></button>
+        <button pButton
+          [class]="filtroData === 'criacao' ? 'p-button-sm' : 'p-button-sm p-button-outlined'"
+          label="Data de Criação"
+          (click)="filtroData = 'criacao'"
+        ></button>
+      </div>
+    </div>
+
+    <button pButton icon="pi pi-refresh" label="Gerar" [loading]="carregando" (click)="gerar()"></button>
+  </div>
+</div>
+
+<!-- ── Loading ────────────────────────────────────────────────────────────── -->
+@if (carregando) {
+  <div class="flex items-center justify-center py-16 text-zinc-400">
+    <i class="pi pi-spin pi-spinner text-2xl mr-3"></i>
+    Gerando mapa de montagem...
+  </div>
+}
+
+<!-- ── Resultado ──────────────────────────────────────────────────────────── -->
+@if (resultado && !carregando) {
+
+  <!-- Cards resumo -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="bg-white border border-zinc-200 rounded-xl p-4">
+      <p class="text-xs font-bold text-zinc-400 uppercase tracking-wide">Clientes</p>
+      <p class="text-2xl font-black text-zinc-800 mt-1">{{ resultado.total_clientes }}</p>
+    </div>
+    <div class="bg-white border border-zinc-200 rounded-xl p-4">
+      <p class="text-xs font-bold text-zinc-400 uppercase tracking-wide">Pedidos</p>
+      <p class="text-2xl font-black text-zinc-800 mt-1">{{ resultado.total_pedidos }}</p>
+    </div>
+    <div class="bg-white border border-zinc-200 rounded-xl p-4">
+      <p class="text-xs font-bold text-zinc-400 uppercase tracking-wide">Total Unidades</p>
+      <p class="text-2xl font-black text-emerald-600 mt-1">{{ resultado.total_itens }}</p>
+    </div>
+  </div>
+
+  <!-- Sem pedidos -->
+  @if (resultado.total_pedidos === 0) {
+    <div class="flex flex-col items-center py-12 text-zinc-400">
+      <i class="pi pi-inbox text-4xl mb-3 text-zinc-300"></i>
+      <p class="font-semibold">Nenhum pedido encontrado no período</p>
+      <p class="text-sm mt-1">Ajuste as datas ou os filtros de status e tente novamente.</p>
+    </div>
+  }
+
+  <!-- Lista por cliente -->
+  @for (cliente of resultado.clientes; track trackByClienteId($index, cliente)) {
+    <div class="mb-6 rounded-xl overflow-hidden border border-zinc-200 bg-white">
+
+      <!-- Cabeçalho do cliente -->
+      <div class="bg-emerald-50 border-b border-emerald-100 px-5 py-3 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <h2 class="text-lg font-black text-emerald-800 truncate">{{ cliente.cliente_nome }}</h2>
+          @if (cliente.cliente_endereco) {
+            <p class="text-xs text-zinc-500 mt-0.5 flex items-center gap-1">
+              <i class="pi pi-map-marker text-xs"></i>{{ cliente.cliente_endereco }}
+            </p>
+          }
+        </div>
+        @if (cliente.cliente_observacoes) {
+          <div class="bg-amber-100 text-amber-800 text-xs font-medium px-3 py-1 rounded-lg flex items-center gap-1 shrink-0">
+            <i class="pi pi-info-circle text-xs"></i>
+            {{ cliente.cliente_observacoes }}
+          </div>
+        }
+      </div>
+
+      <!-- Pedidos do cliente -->
+      @for (pedido of cliente.pedidos; track pedido.pedido_id) {
+        <div class="px-5 py-3 border-b border-zinc-100 last:border-b-0">
+
+          <!-- Cabeçalho do pedido -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <span class="font-mono font-bold text-emerald-600 text-sm">{{ pedido.pedido_numero }}</span>
+              @if (pedido.data_entrega_prevista) {
+                <span class="text-xs text-zinc-500 flex items-center gap-1">
+                  <i class="pi pi-calendar text-xs"></i>
+                  {{ pedido.data_entrega_prevista | date:'dd/MM/yyyy' }}
+                </span>
+              }
+            </div>
+            @if (pedido.observacoes) {
+              <span class="bg-orange-100 text-orange-700 text-xs font-medium px-2 py-0.5 rounded-lg flex items-center gap-1">
+                <i class="pi pi-exclamation-triangle text-xs"></i>
+                {{ pedido.observacoes }}
+              </span>
+            }
+          </div>
+
+          <!-- Itens do pedido -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            @for (item of pedido.itens; track item.nome_snapshot) {
+              <div class="border border-zinc-200 rounded-lg overflow-hidden">
+                <!-- Nome da marmita -->
+                <div class="bg-zinc-50 px-3 py-2 flex items-center justify-between gap-2 border-b border-zinc-200">
+                  <div class="min-w-0">
+                    <p class="font-bold text-zinc-800 text-sm truncate">{{ item.nome_snapshot }}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                      @if (item.tipo_refeicao) {
+                        <span class="text-xs text-zinc-500">{{ tipoRefeicaoLabel(item.tipo_refeicao) }}</span>
+                      }
+                      @if (item.tipo === 'PERSONALIZADO') {
+                        <span class="text-xs bg-violet-100 text-violet-700 font-bold px-1.5 py-0.5 rounded">Personalizado</span>
+                      }
+                    </div>
+                  </div>
+                  <span class="bg-emerald-600 text-white text-xs font-black px-2 py-1 rounded shrink-0">{{ item.quantidade }}x</span>
+                </div>
+                <!-- Composição -->
+                <div class="divide-y divide-zinc-100">
+                  @for (comp of item.composicao; track comp.ingrediente_nome) {
+                    <div class="flex items-center justify-between px-3 py-1.5">
+                      <span class="text-sm text-zinc-700">{{ comp.ingrediente_nome }}</span>
+                      <span class="text-sm font-mono font-semibold text-emerald-600">{{ formatQtdG(comp.quantidade_g) }}</span>
+                    </div>
+                  }
+                  @if (item.embalagem_nome) {
+                    <div class="flex items-center justify-between px-3 py-1.5 bg-sky-50">
+                      <span class="text-sm text-sky-700 italic flex items-center gap-1">
+                        <i class="pi pi-box text-xs"></i>{{ item.embalagem_nome }}
+                      </span>
+                      <span class="text-xs text-sky-500">embalagem</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+}
+
+<!-- Estado vazio -->
+@if (!resultado && !carregando) {
+  <div class="flex flex-col items-center justify-center py-16 text-zinc-400">
+    <i class="pi pi-list-check text-5xl mb-4 text-zinc-300"></i>
+    <p class="text-lg font-semibold">Nenhum mapa gerado</p>
+    <p class="text-sm mt-1">Selecione o período e clique em <strong>Gerar</strong>.</p>
+  </div>
+}
