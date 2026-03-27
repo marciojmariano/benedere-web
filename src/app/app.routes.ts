@@ -132,6 +132,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/estoque/entrada-import.component').then((m) => m.EntradaImportComponent),
       },
+      // ── Produção (BOM) ─────────────────────────────────────────────────
+      {
+        path: 'producao',
+        loadComponent: () =>
+          import('./features/producao/producao-explosao.component').then((m) => m.ProducaoExplosaoComponent),
+      },
       // ── Pedidos ────────────────────────────────────────────────────────
       {
         path: 'pedidos',

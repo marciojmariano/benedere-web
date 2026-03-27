@@ -43,6 +43,7 @@ export class SidebarComponent {
     { label: 'Embalagens', icon: 'pi pi-inbox', route: '/embalagens' },
     { label: 'Estoque', icon: 'pi pi-warehouse', route: '/estoque' },
     { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/pedidos' },
+    { label: 'Produção', icon: 'pi pi-clipboard', route: '/producao' },
   ];
 
   toggleCollapse(): void {

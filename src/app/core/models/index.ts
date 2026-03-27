@@ -317,6 +317,38 @@ export interface PedidoResumo {
   created_at: string;
 }
 
+// ── Produção / BOM ───────────────────────────────────────────────────────────
+
+export interface ExplosaoIngrediente {
+  ingrediente_id: string;
+  ingrediente_nome: string;
+  tipo: TipoIngrediente;
+  unidade_medida: UnidadeMedida;
+  quantidade_total_g: string;
+  custo_kg_medio: string | null;
+  custo_total_estimado: string | null;
+  saldo_atual: string | null;
+  deficit_g: string | null;
+}
+
+export interface ExplosaoPedidoDetalhe {
+  pedido_id: string;
+  pedido_numero: string;
+  cliente_nome: string;
+  data_entrega_prevista: string | null;
+  total_itens: number;
+}
+
+export interface ExplosaoProducaoResponse {
+  periodo_inicio: string;
+  periodo_fim: string;
+  total_pedidos: number;
+  total_ingredientes: number;
+  custo_total_estimado: string;
+  ingredientes: ExplosaoIngrediente[];
+  pedidos: ExplosaoPedidoDetalhe[];
+}
+
 // ── Paginação ─────────────────────────────────────────────────────────────────
 
 export interface ApiResponse<T> {
