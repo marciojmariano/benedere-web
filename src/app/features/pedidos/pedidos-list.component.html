@@ -87,6 +87,11 @@
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
+          <th style="width: 40px">
+            <input type="checkbox" class="w-4 h-4 rounded accent-emerald-600 cursor-pointer"
+                   [checked]="allSelected"
+                   (change)="toggleSelectAll()" />
+          </th>
           <th pSortableColumn="numero">Número <p-sortIcon field="numero" /></th>
           <th>Status</th>
           <th pSortableColumn="valor_total">Valor Total <p-sortIcon field="valor_total" /></th>
@@ -96,7 +101,14 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-p>
-        <tr class="group cursor-pointer hover:bg-zinc-50/50" (click)="ver(p)">
+        <tr class="group cursor-pointer hover:bg-zinc-50/50"
+            [class.bg-emerald-50]="selectedIds.has(p.id)"
+            (click)="ver(p)">
+          <td (click)="toggleSelect(p.id, $event)">
+            <input type="checkbox" class="w-4 h-4 rounded accent-emerald-600 cursor-pointer"
+                   [checked]="selectedIds.has(p.id)"
+                   (click)="toggleSelect(p.id, $event)" />
+          </td>
           <td class="font-semibold text-zinc-800">{{ p.numero }}</td>
           <td><app-status-badge [status]="p.status" /></td>
           <td class="font-medium text-zinc-700">{{ p.valor_total | currencyBrl }}</td>
@@ -104,7 +116,7 @@
           <td class="text-zinc-500 text-sm">{{ formatDate(p.created_at) }}</td>
           <td>
             <button
-              class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors opacity-0 group-hover:opacity-100"
+              class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
               (click)="ver(p); $event.stopPropagation()"
               title="Ver detalhes"
             >
@@ -115,7 +127,7 @@
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6" class="text-center py-12">
+          <td colspan="7" class="text-center py-12">
             <div>
               <i class="pi pi-shopping-cart text-4xl text-zinc-300 mb-3 block"></i>
               <p class="text-zinc-400 font-medium">Nenhum pedido encontrado</p>
@@ -131,3 +143,31 @@
     </p-table>
   </div>
 </div>
+
+<!-- Floating action bar — aparece quando há pedidos selecionados -->
+@if (selectedCount > 0) {
+  <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50
+              flex items-center gap-3
+              bg-zinc-900 text-white rounded-2xl shadow-2xl px-5 py-3">
+    <span class="text-sm font-medium">
+      <span class="text-emerald-400 font-bold">{{ selectedCount }}</span>
+      pedido{{ selectedCount !== 1 ? 's' : '' }} selecionado{{ selectedCount !== 1 ? 's' : '' }}
+    </span>
+    <div class="w-px h-5 bg-zinc-600"></div>
+    <button
+      class="flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-lg
+             bg-emerald-500 hover:bg-emerald-400 text-white transition-colors disabled:opacity-50"
+      [disabled]="printLoading"
+      (click)="imprimirEtiquetas()"
+    >
+      <i class="pi" [class.pi-print]="!printLoading" [class.pi-spin]="printLoading" [class.pi-spinner]="printLoading"></i>
+      Imprimir Etiquetas ({{ selectedCount }})
+    </button>
+    <button
+      class="text-sm text-zinc-400 hover:text-white transition-colors px-2 py-1.5 rounded-lg hover:bg-zinc-700"
+      (click)="selectedIds.clear()"
+    >
+      <i class="pi pi-times text-xs"></i>
+    </button>
+  </div>
+}

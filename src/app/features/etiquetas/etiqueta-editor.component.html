@@ -115,6 +115,35 @@
             styleClass="w-full"
           />
         </div>
+        <div class="pt-1 border-t border-zinc-100">
+          <p class="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2 mt-2">
+            <i class="pi pi-arrows-alt mr-1"></i>
+            Calibração de Offset (Térmica)
+          </p>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-xs text-zinc-500 block mb-1">Offset X (mm)</label>
+              <p-inputnumber
+                formControlName="offset_x_mm"
+                [min]="-20" [max]="20"
+                [showButtons]="true"
+                buttonLayout="horizontal"
+                styleClass="w-full"
+              />
+            </div>
+            <div>
+              <label class="text-xs text-zinc-500 block mb-1">Offset Y (mm)</label>
+              <p-inputnumber
+                formControlName="offset_y_mm"
+                [min]="-20" [max]="20"
+                [showButtons]="true"
+                buttonLayout="horizontal"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
+          <p class="text-[10px] text-zinc-400 mt-1">Ajusta a margem de impressão para calibrar a posição da etiqueta na Elgin L42 Pro.</p>
+        </div>
       </form>
     </div>
 

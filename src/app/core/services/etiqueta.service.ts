@@ -15,6 +15,7 @@ export class EtiquetaService extends ApiService {
     template_delta: any;
     html_output: string;
     dimensions: { w: number; h: number };
+    offset?: { x: number; y: number };
   }): Observable<Tenant> {
     return this.patch<Tenant>(this.path, payload);
   }

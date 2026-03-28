@@ -54,6 +54,8 @@ export class EtiquetaEditorComponent implements OnInit, AfterViewInit, OnDestroy
   dimensionForm = this.fb.group({
     largura_mm: [100, [Validators.required, Validators.min(20), Validators.max(300)]],
     altura_mm: [60, [Validators.required, Validators.min(20), Validators.max(300)]],
+    offset_x_mm: [0, [Validators.required, Validators.min(-20), Validators.max(20)]],
+    offset_y_mm: [0, [Validators.required, Validators.min(-20), Validators.max(20)]],
   });
 
   ngOnInit(): void {
@@ -90,6 +92,12 @@ export class EtiquetaEditorComponent implements OnInit, AfterViewInit, OnDestroy
         }
         if (tenant.etiqueta_altura_mm) {
           this.dimensionForm.patchValue({ altura_mm: tenant.etiqueta_altura_mm });
+        }
+        if (tenant.etiqueta_offset_x_mm !== undefined) {
+          this.dimensionForm.patchValue({ offset_x_mm: tenant.etiqueta_offset_x_mm });
+        }
+        if (tenant.etiqueta_offset_y_mm !== undefined) {
+          this.dimensionForm.patchValue({ offset_y_mm: tenant.etiqueta_offset_y_mm });
         }
         if (tenant.etiqueta_template_delta && this.quill) {
           this.quill.setContents(tenant.etiqueta_template_delta);
@@ -148,12 +156,13 @@ export class EtiquetaEditorComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     this.salvando = true;
-    const { largura_mm, altura_mm } = this.dimensionForm.value;
+    const { largura_mm, altura_mm, offset_x_mm, offset_y_mm } = this.dimensionForm.value;
 
     this.etiquetaService.salvarSettings({
       template_delta: this.quill.getContents(),
       html_output: this.quill.root.innerHTML,
       dimensions: { w: largura_mm!, h: altura_mm! },
+      offset: { x: offset_x_mm!, y: offset_y_mm! },
     }).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', detail: 'Template de etiqueta salvo com sucesso' });

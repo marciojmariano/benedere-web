@@ -5,10 +5,14 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
+import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
+import { forkJoin } from 'rxjs';
 
 import { PedidoService } from '../../core/services/pedido.service';
-import { PedidoResumo, StatusPedido, STATUS_PEDIDO_LABELS } from '../../core/models';
+import { EtiquetaService } from '../../core/services/etiqueta.service';
+import { EtiquetaLabelPrintService } from '../etiquetas/services/etiqueta-label-print.service';
+import { PedidoResumo, StatusPedido, STATUS_PEDIDO_LABELS, Tenant } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
@@ -18,13 +22,15 @@ import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
   standalone: true,
   imports: [
     CommonModule, TableModule, ButtonModule, ToastModule, InputTextModule,
-    PageHeaderComponent, StatusBadgeComponent, CurrencyBrlPipe,
+    CheckboxModule, PageHeaderComponent, StatusBadgeComponent, CurrencyBrlPipe,
   ],
   providers: [MessageService],
   templateUrl: './pedidos-list.component.html',
 })
 export class PedidosListComponent implements OnInit {
   private service = inject(PedidoService);
+  private etiquetaService = inject(EtiquetaService);
+  private printService = inject(EtiquetaLabelPrintService);
   private router = inject(Router);
   private messageService = inject(MessageService);
 
@@ -32,13 +38,24 @@ export class PedidosListComponent implements OnInit {
   loading = false;
   statusFiltro: StatusPedido | null = null;
 
+  selectedIds = new Set<string>();
+  printLoading = false;
+
+  private tenant: Tenant | null = null;
+
   statusOptions = Object.values(StatusPedido);
   statusLabels = STATUS_PEDIDO_LABELS;
 
-  ngOnInit(): void { this.carregar(); }
+  ngOnInit(): void {
+    this.carregar();
+    this.etiquetaService.obterSettings().subscribe({
+      next: t => (this.tenant = t),
+    });
+  }
 
   carregar(): void {
     this.loading = true;
+    this.selectedIds.clear();
     this.service.listar(this.statusFiltro || undefined).subscribe({
       next: (data) => { this.pedidos = data; this.loading = false; },
       error: () => {
@@ -51,6 +68,62 @@ export class PedidosListComponent implements OnInit {
   toggleStatus(status: StatusPedido): void {
     this.statusFiltro = this.statusFiltro === status ? null : status;
     this.carregar();
+  }
+
+  toggleSelect(id: string, event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.selectedIds.has(id)) {
+      this.selectedIds.delete(id);
+    } else {
+      this.selectedIds.add(id);
+    }
+  }
+
+  toggleSelectAll(): void {
+    if (this.selectedIds.size === this.pedidos.length) {
+      this.selectedIds.clear();
+    } else {
+      this.pedidos.forEach(p => this.selectedIds.add(p.id));
+    }
+  }
+
+  get allSelected(): boolean {
+    return this.pedidos.length > 0 && this.selectedIds.size === this.pedidos.length;
+  }
+
+  get selectedCount(): number {
+    return this.selectedIds.size;
+  }
+
+  imprimirEtiquetas(): void {
+    if (!this.tenant) {
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Configurações de etiqueta não carregadas.' });
+      return;
+    }
+    if (this.selectedIds.size === 0) return;
+
+    this.printLoading = true;
+    const ids = Array.from(this.selectedIds);
+    this.service.bulkLabelData(ids).subscribe({
+      next: (items) => {
+        this.printService.print(items, this.tenant!);
+        this.service.marcarImpressas(items.map(i => i.item_id)).subscribe({
+          next: (res) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Impressão iniciada',
+              detail: `${res.marcados} etiqueta(s) marcadas como impressas.`,
+            });
+          },
+        });
+        this.printLoading = false;
+        this.selectedIds.clear();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao buscar dados para impressão.' });
+        this.printLoading = false;
+      },
+    });
   }
 
   // KPIs

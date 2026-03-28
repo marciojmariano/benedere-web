@@ -124,6 +124,8 @@ export interface Tenant {
   etiqueta_html_output?: string | null;
   etiqueta_largura_mm?: number | null;
   etiqueta_altura_mm?: number | null;
+  etiqueta_offset_x_mm?: number;
+  etiqueta_offset_y_mm?: number;
 }
 
 export interface IngredienteEtiqueta {
@@ -305,6 +307,7 @@ export interface PedidoItem {
   quantidade: number;
   preco_unitario: string;
   preco_total: string;
+  etiqueta_impressa: boolean;
   composicao: PedidoItemComposicao[];
   embalagem_ingrediente_id: string | null;
   embalagem_nome_snapshot: string | null;
@@ -407,6 +410,21 @@ export interface MapaMontagemResponse {
   total_pedidos: number;
   total_itens: number;
   clientes: MapaClienteGrupo[];
+}
+
+// ── Impressão de Etiquetas em Lote ────────────────────────────────────────────
+
+export interface BulkLabelItem {
+  item_id: string;
+  pedido_numero: string;
+  cliente_nome: string;
+  tipo_refeicao: string | null;
+  data_fabricacao: string;
+  data_validade: string;
+  empresa_nome: string;
+  empresa_cnpj: string;
+  ingredientes: IngredienteEtiqueta[];
+  etiqueta_impressa: boolean;
 }
 
 // ── Paginação ─────────────────────────────────────────────────────────────────

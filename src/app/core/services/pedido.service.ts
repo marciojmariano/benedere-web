@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from './api.service';
-import { Pedido, PedidoResumo, StatusPedido } from '../models';
+import { BulkLabelItem, Pedido, PedidoResumo, StatusPedido } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -46,5 +46,13 @@ export class PedidoService extends ApiService {
 
   duplicar(id: string): Observable<Pedido> {
     return this.post<Pedido>(`/pedidos/${id}/duplicar`, {});
+  }
+
+  bulkLabelData(pedidoIds: string[]): Observable<BulkLabelItem[]> {
+    return this.post<BulkLabelItem[]>('/pedidos/bulk-label-data', { pedido_ids: pedidoIds });
+  }
+
+  marcarImpressas(itemIds: string[]): Observable<{ marcados: number }> {
+    return this.patch<{ marcados: number }>('/pedidos/marcar-impressas', { item_ids: itemIds });
   }
 }
