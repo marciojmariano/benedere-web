@@ -93,6 +93,7 @@
                    (change)="toggleSelectAll()" />
           </th>
           <th pSortableColumn="numero">Número <p-sortIcon field="numero" /></th>
+          <th pSortableColumn="cliente_nome">Cliente <p-sortIcon field="cliente_nome" /></th>
           <th>Status</th>
           <th pSortableColumn="valor_total">Valor Total <p-sortIcon field="valor_total" /></th>
           <th>Itens</th>
@@ -110,6 +111,7 @@
                    (click)="toggleSelect(p.id, $event)" />
           </td>
           <td class="font-semibold text-zinc-800">{{ p.numero }}</td>
+          <td class="text-zinc-700">{{ p.cliente_nome }}</td>
           <td><app-status-badge [status]="p.status" /></td>
           <td class="font-medium text-zinc-700">{{ p.valor_total | currencyBrl }}</td>
           <td class="text-zinc-600">{{ p.total_itens }}</td>
@@ -127,7 +129,7 @@
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="text-center py-12">
+          <td colspan="8" class="text-center py-12">
             <div>
               <i class="pi pi-shopping-cart text-4xl text-zinc-300 mb-3 block"></i>
               <p class="text-zinc-400 font-medium">Nenhum pedido encontrado</p>
