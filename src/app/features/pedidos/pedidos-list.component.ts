@@ -7,12 +7,12 @@ import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
-import { forkJoin } from 'rxjs';
 
 import { PedidoService } from '../../core/services/pedido.service';
 import { EtiquetaService } from '../../core/services/etiqueta.service';
 import { EtiquetaLabelPrintService } from '../etiquetas/services/etiqueta-label-print.service';
-import { PedidoResumo, StatusPedido, STATUS_PEDIDO_LABELS, Tenant } from '../../core/models';
+import { EtiquetaRenderService } from '../etiquetas/services/etiqueta-render.service';
+import { PedidoResumo, StatusPedido, STATUS_PEDIDO_LABELS, Tenant, BulkLabelItem } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
@@ -28,21 +28,23 @@ import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
   templateUrl: './pedidos-list.component.html',
 })
 export class PedidosListComponent implements OnInit {
+  // Injeção de Dependências
   private service = inject(PedidoService);
   private etiquetaService = inject(EtiquetaService);
   private printService = inject(EtiquetaLabelPrintService);
+  private renderService = inject(EtiquetaRenderService);
   private router = inject(Router);
   private messageService = inject(MessageService);
 
+  // Estado
   pedidos: PedidoResumo[] = [];
   loading = false;
   statusFiltro: StatusPedido | null = null;
-
   selectedIds = new Set<string>();
   printLoading = false;
+  tenant: Tenant | null = null;
 
-  private tenant: Tenant | null = null;
-
+  // Labels
   statusOptions = Object.values(StatusPedido);
   statusLabels = STATUS_PEDIDO_LABELS;
 
@@ -57,7 +59,10 @@ export class PedidosListComponent implements OnInit {
     this.loading = true;
     this.selectedIds.clear();
     this.service.listar(this.statusFiltro || undefined).subscribe({
-      next: (data) => { this.pedidos = data; this.loading = false; },
+      next: (data) => { 
+        this.pedidos = data; 
+        this.loading = false; 
+      },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao carregar pedidos' });
         this.loading = false;
@@ -65,6 +70,84 @@ export class PedidosListComponent implements OnInit {
     });
   }
 
+  imprimirEtiquetas(): void {
+    if (!this.tenant) {
+      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Configurações de etiqueta não carregadas.' });
+      return;
+    }
+    if (this.selectedIds.size === 0) return;
+
+    this.printLoading = true;
+    const ids = Array.from(this.selectedIds);
+
+    this.service.bulkLabelData(ids).subscribe({
+      next: (items: BulkLabelItem[]) => {
+        // Processamento para BUG009 (Alinhamento) e TS2345 (Null Safety)
+        const itemsProcessados = items.map(item => {
+          const htmlRenderizado = this.renderService.render(
+            this.tenant!.etiqueta_html_output ?? '', 
+            {
+              ...item,
+              tipo_refeicao: item.tipo_refeicao ?? ''
+            }
+          );
+          
+          return {
+            ...item,
+            html: htmlRenderizado 
+          };
+        });
+
+        this.printService.print(itemsProcessados, this.tenant!);
+
+        const uniqueIds = [...new Set(items.map(i => i.item_id))];
+        this.service.marcarImpressas(uniqueIds).subscribe({
+          next: (res) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Impressão iniciada',
+              detail: `${res.marcados} etiqueta(s) marcadas como impressas.`,
+            });
+            this.carregar();
+          },
+        });
+
+        this.printLoading = false;
+        this.selectedIds.clear();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao buscar dados para impressão.' });
+        this.printLoading = false;
+      },
+    });
+  }
+
+  // --- Getters para o Template (KPIs) ---
+  get totalPedidos(): number { return this.pedidos.length; }
+
+  get pedidosPendentes(): number { 
+    return this.pedidos.filter(p => p.status === StatusPedido.RASCUNHO || p.status === StatusPedido.APROVADO).length; 
+  }
+
+  get pedidosEmProducao(): number { 
+    return this.pedidos.filter(p => p.status === StatusPedido.EM_PRODUCAO).length; 
+  }
+
+  get pedidosEntregues(): number { 
+    return this.pedidos.filter(p => p.status === StatusPedido.ENTREGUE).length; 
+  }
+
+  get valorTotal(): number { 
+    return this.pedidos.reduce((acc, p) => acc + parseFloat(p.valor_total), 0); 
+  }
+
+  get allSelected(): boolean {
+    return this.pedidos.length > 0 && this.selectedIds.size === this.pedidos.length;
+  }
+
+  get selectedCount(): number { return this.selectedIds.size; }
+
+  // --- Métodos de UI ---
   toggleStatus(status: StatusPedido): void {
     this.statusFiltro = this.statusFiltro === status ? null : status;
     this.carregar();
@@ -87,52 +170,6 @@ export class PedidosListComponent implements OnInit {
     }
   }
 
-  get allSelected(): boolean {
-    return this.pedidos.length > 0 && this.selectedIds.size === this.pedidos.length;
-  }
-
-  get selectedCount(): number {
-    return this.selectedIds.size;
-  }
-
-  imprimirEtiquetas(): void {
-    if (!this.tenant) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Configurações de etiqueta não carregadas.' });
-      return;
-    }
-    if (this.selectedIds.size === 0) return;
-
-    this.printLoading = true;
-    const ids = Array.from(this.selectedIds);
-    this.service.bulkLabelData(ids).subscribe({
-      next: (items) => {
-        this.printService.print(items, this.tenant!);
-        this.service.marcarImpressas(items.map(i => i.item_id)).subscribe({
-          next: (res) => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Impressão iniciada',
-              detail: `${res.marcados} etiqueta(s) marcadas como impressas.`,
-            });
-          },
-        });
-        this.printLoading = false;
-        this.selectedIds.clear();
-      },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao buscar dados para impressão.' });
-        this.printLoading = false;
-      },
-    });
-  }
-
-  // KPIs
-  get totalPedidos(): number { return this.pedidos.length; }
-  get pedidosPendentes(): number { return this.pedidos.filter(p => p.status === StatusPedido.RASCUNHO || p.status === StatusPedido.APROVADO).length; }
-  get pedidosEmProducao(): number { return this.pedidos.filter(p => p.status === StatusPedido.EM_PRODUCAO).length; }
-  get pedidosEntregues(): number { return this.pedidos.filter(p => p.status === StatusPedido.ENTREGUE).length; }
-  get valorTotal(): number { return this.pedidos.reduce((acc, p) => acc + parseFloat(p.valor_total), 0); }
-
   chipClass(status: StatusPedido): string {
     if (this.statusFiltro !== status) return 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300';
     const map: Record<StatusPedido, string> = {
@@ -147,8 +184,5 @@ export class PedidosListComponent implements OnInit {
 
   novo(): void { this.router.navigate(['/pedidos/novo']); }
   ver(p: PedidoResumo): void { this.router.navigate(['/pedidos', p.id]); }
-
-  formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('pt-BR');
-  }
+  formatDate(date: string): string { return new Date(date).toLocaleDateString('pt-BR'); }
 }

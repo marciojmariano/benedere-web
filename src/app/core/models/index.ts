@@ -141,6 +141,7 @@ export interface EtiquetaData {
   empresa_nome: string;
   empresa_cnpj: string;
   ingredientes: IngredienteEtiqueta[];
+  ingredientes_html?: string;
   [key: string]: any;
 }
 
@@ -424,7 +425,10 @@ export interface BulkLabelItem {
   empresa_nome: string;
   empresa_cnpj: string;
   ingredientes: IngredienteEtiqueta[];
+  ingredientes_html: string;
   etiqueta_impressa: boolean;
+  copia?: number;
+  total_copias?: number;
 }
 
 // ── Paginação ─────────────────────────────────────────────────────────────────

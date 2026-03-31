@@ -52,8 +52,8 @@ export class EtiquetaEditorComponent implements OnInit, AfterViewInit, OnDestroy
   readonly categories = PLACEHOLDER_CATEGORIES;
 
   dimensionForm = this.fb.group({
-    largura_mm: [100, [Validators.required, Validators.min(20), Validators.max(300)]],
-    altura_mm: [60, [Validators.required, Validators.min(20), Validators.max(300)]],
+    largura_mm: [130, [Validators.required, Validators.min(20), Validators.max(300)]],
+    altura_mm: [90, [Validators.required, Validators.min(20), Validators.max(300)]],
     offset_x_mm: [0, [Validators.required, Validators.min(-20), Validators.max(20)]],
     offset_y_mm: [0, [Validators.required, Validators.min(-20), Validators.max(20)]],
   });
@@ -180,11 +180,13 @@ export class EtiquetaEditorComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   get previewStyle(): Record<string, string> {
-    const w = this.dimensionForm.value.largura_mm ?? 100;
-    const h = this.dimensionForm.value.altura_mm ?? 60;
+    const w = this.dimensionForm.value.largura_mm ?? 130;
+    const h = this.dimensionForm.value.altura_mm ?? 90;
     return {
       width: `${w}mm`,
-      minHeight: `${h}mm`,
+      height: `${h}mm`,
+      maxHeight: `${h}mm`,
+      overflow: 'hidden',
     };
   }
 }

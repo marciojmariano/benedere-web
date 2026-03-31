@@ -47,6 +47,7 @@ const mockPedido: Pedido = {
       embalagem_ingrediente_id: null,
       embalagem_nome_snapshot: null,
       embalagem_custo_snapshot: null,
+      etiqueta_impressa: false,
     },
     {
       id: 'i2',
@@ -61,6 +62,7 @@ const mockPedido: Pedido = {
       embalagem_ingrediente_id: null,
       embalagem_nome_snapshot: null,
       embalagem_custo_snapshot: null,
+      etiqueta_impressa: false,
     },
   ],
 };

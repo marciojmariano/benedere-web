@@ -58,7 +58,7 @@
     <div
       id="quill-editor-container"
       class="border border-zinc-200 border-t-0 rounded-b-lg bg-white"
-      style="min-height: 300px"
+      [style.min-height]="(dimensionForm.value.altura_mm ?? 90) + 'mm'"
     ></div>
 
     <!-- Seção de Preview (abaixo do editor, visível após clicar Preview) -->

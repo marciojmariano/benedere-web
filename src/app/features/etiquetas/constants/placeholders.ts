@@ -12,6 +12,7 @@ export const PLACEHOLDERS: PlaceholderDef[] = [
   { key: 'data_validade',    label: 'Data de Validade',   category: 'Datas',    sampleValue: '30/03/2026' },
   { key: 'empresa_nome',     label: 'Nome da Empresa',    category: 'Empresa',  sampleValue: 'Benedere Fit' },
   { key: 'empresa_cnpj',     label: 'CNPJ da Empresa',    category: 'Empresa',  sampleValue: '12.345.678/0001-90' },
+  { key: 'pedido_numero',    label: 'Número do Pedido',   category: 'Pedido',   sampleValue: 'PED-00042' },
 ];
 
 export const PLACEHOLDER_CATEGORIES = [...new Set(PLACEHOLDERS.map(p => p.category))];

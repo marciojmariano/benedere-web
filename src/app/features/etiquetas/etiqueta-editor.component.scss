@@ -44,18 +44,38 @@
 // Container do preview dimensionado
 .label-preview-container {
   border: 1px dashed #d4d4d8;
-  padding: 4mm;
+  padding: 2mm;
   overflow: hidden;
   background: white;
   font-family: Arial, sans-serif;
-  font-size: 10px;
+  font-size: 2.5mm;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
 
   :host ::ng-deep .ingredientes-table {
+    margin-top: auto;
     td {
-      padding: 1px 4px;
+      padding: 0.3mm 1mm;
       border-bottom: 0.5px solid #e4e4e7;
+      font-size: 2.2mm;
     }
+  }
+
+  // Quill formatting classes — preview usa [innerHTML], não herda .ql-editor scope
+  :host ::ng-deep {
+    .ql-align-center { text-align: center; }
+    .ql-align-right { text-align: right; }
+    .ql-align-justify { text-align: justify; }
+    .ql-size-small { font-size: 0.75em; }
+    .ql-size-large { font-size: 1.5em; }
+    .ql-size-huge { font-size: 2.5em; }
+    .ql-font-serif { font-family: Georgia, "Times New Roman", serif; }
+    .ql-font-monospace { font-family: Monaco, "Courier New", monospace; }
+    .ql-indent-1 { padding-left: 3em; }
+    .ql-indent-2 { padding-left: 6em; }
+    .ql-indent-3 { padding-left: 9em; }
+    .ql-indent-4 { padding-left: 12em; }
   }
 }
 
