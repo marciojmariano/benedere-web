@@ -310,6 +310,7 @@ export interface PedidoResumo {
   id: string;
   numero: string;
   cliente_id: string;
+  cliente_nome: string;
   status: StatusPedido;
   valor_total: string;
   total_itens: number;
