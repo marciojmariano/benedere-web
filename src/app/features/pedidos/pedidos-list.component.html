@@ -1,133 +1,144 @@
-<div>
+<div class="flex-1 flex flex-col overflow-hidden">
   <p-toast />
 
   <app-page-header title="Pedidos" subtitle="Gerencie os pedidos de venda">
     <p-button label="Novo Pedido" icon="pi pi-plus" (onClick)="novo()" />
   </app-page-header>
 
-  <!-- KPI Summary -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
-        <i class="pi pi-list text-zinc-500 text-sm"></i>
-      </div>
-      <div>
-        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Total</p>
-        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ totalPedidos }}</p>
-      </div>
+  <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
+    
+    <app-kpi-card 
+      [value]="contarPedidos()"
+      label="Total de Pedidos" 
+      icon="list"
+      [amount]="calcularValorTotal()"
+      color="sky">
+      <app-icon name="list" [size]="18" class="text-sky-500"></app-icon>
+    </app-kpi-card>
+
+    <app-kpi-card 
+      label="Rascunhos" 
+      [value]="contarPedidos('RASCUNHO')" 
+      icon="draft"
+      [amount]="calcularValorTotal('RASCUNHO')"
+      color="zinc">
+      <app-icon name="draft" [size]="18" class="text-zinc-500"></app-icon>
+    </app-kpi-card>
+
+    <app-kpi-card 
+      label="Aprovados" 
+      [value]="contarPedidos('APROVADO')" 
+      icon="clock"
+      [amount]="calcularValorTotal('APROVADO')"
+      color="sky">
+       <app-icon name="clock" [size]="18" class="text-sky-500"></app-icon>
+    </app-kpi-card>
+
+    <app-kpi-card 
+      label="Em Produção" 
+      [value]="contarPedidos('EM_PRODUCAO')" 
+      icon="settings"
+      [amount]="calcularValorTotal('EM_PRODUCAO')"
+      color="violet">
+      <app-icon name="settings" [size]="18" class="text-violet-500"></app-icon>
+    </app-kpi-card>
+
+    <app-kpi-card 
+      label="Entregues" 
+      [value]="contarPedidos('ENTREGUE')" 
+      icon="check"
+      [amount]="calcularValorTotal('ENTREGUE')"
+      color="emerald">
+      <app-icon name="check" [size]="18" class="text-emerald-500"></app-icon>
+    </app-kpi-card>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm px-4 py-3 flex items-center gap-3 mb-3">
+  
+    <div class="flex items-center gap-2 flex-nowrap">
+      <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mr-1 whitespace-nowrap">Filtrar:</span>
+      
+      @for (status of statusOptions; track status) {
+        <button
+          class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border shadow-sm whitespace-nowrap"
+          [class]="chipClass(status)"
+          (click)="toggleStatus(status)">
+          {{ statusLabels[status] }}
+        </button>
+      }
+
+      @if (statusFiltro) {
+        <button
+          class="flex items-center whitespace-nowrap px-3 py-1.5 text-xs font-bold text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
+          (click)="statusFiltro = null; carregar()">
+          <app-icon name="x" [size]="14" class="mr-1"></app-icon> 
+          Limpar Filtro
+        </button>
+      }
     </div>
-    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-        <i class="pi pi-clock text-amber-500 text-sm"></i>
-      </div>
-      <div>
-        <p class="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Pendentes</p>
-        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ pedidosPendentes }}</p>
-      </div>
-    </div>
-    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
-        <i class="pi pi-cog text-violet-500 text-sm"></i>
-      </div>
-      <div>
-        <p class="text-[10px] font-semibold text-violet-500 uppercase tracking-wide">Em Produção</p>
-        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ pedidosEmProducao }}</p>
-      </div>
-    </div>
-    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-        <i class="pi pi-truck text-emerald-500 text-sm"></i>
-      </div>
-      <div>
-        <p class="text-[10px] font-semibold text-emerald-500 uppercase tracking-wide">Entregues</p>
-        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ pedidosEntregues }}</p>
-      </div>
+
+    <div class="relative flex-1">
+      <app-icon name="search" [size]="16" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"></app-icon>
+      <input 
+        pInputText 
+        type="text" 
+        placeholder="Buscar por número..." 
+        class="w-full pl-10 py-2 border border-zinc-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+        (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
     </div>
   </div>
 
-  <!-- Status filter chips -->
-  <div class="flex flex-wrap gap-2 mb-4">
-    @for (status of statusOptions; track status) {
-      <button
-        class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors border"
-        [class]="chipClass(status)"
-        (click)="toggleStatus(status)"
-      >
-        {{ statusLabels[status] }}
-      </button>
-    }
-    @if (statusFiltro) {
-      <button
-        class="px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-zinc-600 transition-colors"
-        (click)="statusFiltro = null; carregar()"
-      >
-        <i class="pi pi-times text-xs mr-1"></i> Limpar
-      </button>
-    }
-  </div>
-
-  <div class="bg-white rounded-2xl shadow-sm border border-zinc-100">
+  <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
     <p-table #dt [value]="pedidos" [loading]="loading" [paginator]="true" [rows]="10"
              [globalFilterFields]="['numero']" styleClass="p-datatable-sm">
-      <ng-template pTemplate="caption">
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-zinc-400">
-            {{ pedidos.length }} pedido{{ pedidos.length !== 1 ? 's' : '' }}
-            @if (pedidos.length > 0) {
-              &nbsp;&middot;&nbsp;
-              <span class="text-emerald-600 font-semibold">{{ valorTotal | currencyBrl }}</span>
-            }
-          </span>
-          <div class="relative">
-            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
-            <input pInputText type="text" placeholder="Buscar por número..." class="w-56 pl-9"
-                   (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
-          </div>
-        </div>
-      </ng-template>
+      
       <ng-template pTemplate="header">
-        <tr>
-          <th pSortableColumn="numero">Número <p-sortIcon field="numero" /></th>
-          <th>Status</th>
-          <th pSortableColumn="valor_total">Valor Total <p-sortIcon field="valor_total" /></th>
-          <th>Itens</th>
-          <th pSortableColumn="created_at">Data <p-sortIcon field="created_at" /></th>
-          <th style="width: 80px"></th>
+        <tr class="border-b border-zinc-100 bg-zinc-50/60">
+          <th class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">Nº Pedido <p-sortIcon field="numero" /></th>
+          <th class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">Status</th>
+          <th pSortableColumn="valor_total" class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider ">Valor Total <p-sortIcon field="valor_total" /></th>
+          <th class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">Itens</th>
+          <th pSortableColumn="created_at" class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">Data <p-sortIcon field="created_at" /></th>
+          <th class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider"></th>
         </tr>
       </ng-template>
+
       <ng-template pTemplate="body" let-p>
-        <tr class="group cursor-pointer hover:bg-zinc-50/50" (click)="ver(p)">
-          <td class="font-semibold text-zinc-800">{{ p.numero }}</td>
-          <td><app-status-badge [status]="p.status" /></td>
-          <td class="font-medium text-zinc-700">{{ p.valor_total | currencyBrl }}</td>
-          <td class="text-zinc-600">{{ p.total_itens }}</td>
-          <td class="text-zinc-500 text-sm">{{ formatDate(p.created_at) }}</td>
-          <td>
+        <tr class="group cursor-pointer hover:bg-zinc-50/30 transition-colors" (click)="ver(p)">
+          <td class="text-center text-xs font-mono font-bold text-indigo-600">#{{ p.numero }}</td>
+          <td class="py-2 px-5 text-center">
+            <app-status-badge [status]="p.status"></app-status-badge>
+          </td>
+          <td class="text-sm font-bold text-emerald-700 text-center">{{ p.valor_total | currencyBrl }}</td>
+          <td class="py-2 px-5 text-zinc-600 text-center">{{ p.total_itens }}</td>
+          <td class="text-center text-sm text-zinc-500">{{ formatDate(p.created_at) }}</td>
+          <td class="text-centerpy-2 px-5 text-right">
             <button
-              class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors opacity-0 group-hover:opacity-100"
+              class="p-2 rounded-lg text-zinc-300 group-hover:text-emerald-600 group-hover:bg-emerald-50 transition-all"
               (click)="ver(p); $event.stopPropagation()"
-              title="Ver detalhes"
-            >
-              <i class="pi pi-eye"></i>
+              title="Ver detalhes">
+              <app-icon name="info" [size]="18"></app-icon>
             </button>
           </td>
         </tr>
       </ng-template>
+
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6" class="text-center py-12">
-            <div>
-              <i class="pi pi-shopping-cart text-4xl text-zinc-300 mb-3 block"></i>
-              <p class="text-zinc-400 font-medium">Nenhum pedido encontrado</p>
+          <td colspan="6" class="text-center py-20 bg-zinc-50/20">
+            <div class="flex flex-col items-center">
+              <app-icon name="shoppingBag" [size]="48" class="text-zinc-200 mb-4"></app-icon>
+              <p class="text-zinc-500 font-semibold">Nenhum pedido encontrado</p>
               @if (!statusFiltro) {
-                <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro pedido clicando em "Novo Pedido"</p>
+                <p class="text-zinc-400 text-sm mt-1">Sua base de vendas está pronta para começar!</p>
               } @else {
-                <p class="text-zinc-300 text-sm mt-1">Nenhum pedido com status "{{ statusLabels[statusFiltro] }}"</p>
+                <p class="text-zinc-400 text-sm mt-1">Nenhum resultado para o status selecionado.</p>
               }
             </div>
           </td>
         </tr>
       </ng-template>
+
     </p-table>
   </div>
 </div>

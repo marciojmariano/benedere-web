@@ -11,14 +11,17 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ProdutoService } from '../../core/services/produto.service';
 import { Produto } from '../../core/models';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { KpiCardComponent } from '../../shared/components/kpi-card.component';
+import { IconComponent } from '../../shared/components/icon.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
+
 
 @Component({
   selector: 'app-produtos-list',
   standalone: true,
   imports: [
     CommonModule, TableModule, ButtonModule, ToastModule, ConfirmDialogModule,
-    InputTextModule, PageHeaderComponent, StatusBadgeComponent,
+    InputTextModule, PageHeaderComponent, StatusBadgeComponent, KpiCardComponent, IconComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './produtos-list.component.html',

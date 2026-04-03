@@ -6,96 +6,93 @@
     <p-button label="Novo Produto" icon="pi pi-plus" (onClick)="novo()" />
   </app-page-header>
 
-  <!-- KPI Summary -->
-  <div class="grid grid-cols-3 gap-3 mb-5">
-    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
-        <i class="pi pi-shopping-bag text-zinc-500 text-sm"></i>
-      </div>
-      <div>
-        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Total</p>
-        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ produtos.length }}</p>
-      </div>
-    </div>
-    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-        <i class="pi pi-check-circle text-emerald-500 text-sm"></i>
-      </div>
-      <div>
-        <p class="text-[10px] font-semibold text-emerald-500 uppercase tracking-wide">Ativos</p>
-        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ totalAtivos }}</p>
-      </div>
-    </div>
-    <div class="bg-white rounded-xl border border-zinc-100 p-4 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-rose-50 flex items-center justify-center shrink-0">
-        <i class="pi pi-times-circle text-rose-400 text-sm"></i>
-      </div>
-      <div>
-        <p class="text-[10px] font-semibold text-rose-400 uppercase tracking-wide">Inativos</p>
-        <p class="text-xl font-bold text-zinc-800 leading-none mt-0.5">{{ totalInativos }}</p>
-      </div>
-    </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <app-kpi-card 
+      label="Total de Produtos" 
+      [value]="produtos.length" 
+      icon="shoppingBag"
+      color="sky">
+      <app-icon name="shoppingBag" [size]="22" class="text-zinc-500"></app-icon>
+    </app-kpi-card>
+
+    <app-kpi-card 
+      label="Produtos Ativos" 
+      [value]="totalAtivos" 
+      icon="check"
+      color="emerald">
+      <app-icon name="check" [size]="22" class="text-emerald-500"></app-icon>
+    </app-kpi-card>
+
+    <app-kpi-card 
+      label="Produtos Inativos" 
+      [value]="totalInativos" 
+      icon="x"
+      color="rose">
+      <app-icon name="x" [size]="22" class="text-rose-400"></app-icon>
+    </app-kpi-card>
   </div>
 
-  <div class="bg-white rounded-2xl shadow-sm border border-zinc-100">
+  <div class="bg-white rounded-2xl shadow-sm border border-zinc-100 overflow-hidden">
     <p-table #dt [value]="produtos" [loading]="loading" [paginator]="true" [rows]="10"
              [globalFilterFields]="['nome']" styleClass="p-datatable-sm">
+      
       <ng-template pTemplate="caption">
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-zinc-400">
-            {{ produtos.length }} produto{{ produtos.length !== 1 ? 's' : '' }}
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-2">
+          <span class="text-sm text-zinc-400 font-medium">
+            {{ produtos.length }} produto{{ produtos.length !== 1 ? 's' : '' }} no catálogo
           </span>
-          <div class="relative">
-            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
-            <input pInputText type="text" placeholder="Buscar produto..." class="w-64 pl-9"
+          <div class="relative w-full md:w-64">
+            <app-icon name="search" [size]="16" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"></app-icon>
+            <input pInputText type="text" placeholder="Buscar produto..." 
+                   class="w-full pl-10 py-2 border-zinc-200 rounded-xl text-sm focus:ring-emerald-500"
                    (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
           </div>
         </div>
       </ng-template>
+
       <ng-template pTemplate="header">
-        <tr>
-          <th pSortableColumn="nome">Nome <p-sortIcon field="nome" /></th>
-          <th pSortableColumn="peso_total_g">Peso <p-sortIcon field="peso_total_g" /></th>
-          <th>Status</th>
-          <th style="width: 120px">Ações</th>
+        <tr class="bg-zinc-50/50">
+          <th pSortableColumn="nome" class="py-4 px-5 text-zinc-600 font-semibold">Nome <p-sortIcon field="nome" /></th>
+          <th pSortableColumn="peso_total_g" class="py-4 px-5 text-zinc-600 font-semibold">Peso <p-sortIcon field="peso_total_g" /></th>
+          <th class="py-4 px-5 text-zinc-600 font-semibold">Status</th>
+          <th style="width: 120px" class="py-4 px-5 text-zinc-600 font-semibold text-center">Ações</th>
         </tr>
       </ng-template>
+
       <ng-template pTemplate="body" let-p>
-        <tr class="group">
-          <td class="font-medium text-zinc-800">{{ p.nome }}</td>
-          <td class="text-zinc-600 tabular-nums">{{ p.peso_total_g }}g</td>
-          <td><app-status-badge [status]="p.ativo ? 'ativo' : 'inativo'" /></td>
-          <td>
-            <div class="flex gap-1">
-              <button
-                class="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
-                (click)="editar(p)"
-                title="Editar"
-              >
-                <i class="pi pi-pencil"></i>
+        <tr class="group hover:bg-zinc-50/30 transition-colors">
+          <td class="py-4 px-5 font-medium text-zinc-800">{{ p.nome }}</td>
+          <td class="py-4 px-5 text-zinc-600 tabular-nums">{{ p.peso_total_g }}g</td>
+          <td class="py-4 px-5">
+            <app-status-badge [status]="p.ativo ? 'Ativo' : 'Inativo'"></app-status-badge>
+          </td>
+          <td class="py-4 px-5 text-center">
+            <div class="flex justify-center gap-2">
+              <button (click)="editar(p)" title="Editar"
+                class="p-2 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all">
+                <app-icon name="edit" [size]="18"></app-icon>
               </button>
-              <button
-                class="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                (click)="confirmarDesativar(p)"
-                title="Desativar"
-              >
-                <i class="pi pi-trash"></i>
+              <button (click)="confirmarDesativar(p)" title="Desativar"
+                class="p-2 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-all">
+                <app-icon name="trash" [size]="18"></app-icon>
               </button>
             </div>
           </td>
         </tr>
       </ng-template>
+
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="4" class="text-center py-12">
-            <div>
-              <i class="pi pi-box text-4xl text-zinc-300 mb-3 block"></i>
-              <p class="text-zinc-400 font-medium">Nenhum produto encontrado</p>
-              <p class="text-zinc-300 text-sm mt-1">Crie seu primeiro produto clicando em "Novo Produto"</p>
+          <td colspan="4" class="text-center py-20 bg-zinc-50/20">
+            <div class="flex flex-col items-center">
+              <app-icon name="grid" [size]="48" class="text-zinc-200 mb-4"></app-icon>
+              <p class="text-zinc-500 font-semibold">Nenhum produto encontrado</p>
+              <p class="text-zinc-400 text-sm mt-1">Sua lista está vazia ou o filtro não retornou resultados.</p>
             </div>
           </td>
         </tr>
       </ng-template>
+
     </p-table>
   </div>
 </div>

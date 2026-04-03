@@ -12,13 +12,15 @@ import { PedidoResumo, StatusPedido, STATUS_PEDIDO_LABELS } from '../../core/mod
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
+import { IconComponent } from '../../shared/components/icon.component';
+import { KpiCardComponent } from '../../shared/components/kpi-card.component';
 
 @Component({
   selector: 'app-pedidos-list',
   standalone: true,
   imports: [
     CommonModule, TableModule, ButtonModule, ToastModule, InputTextModule,
-    PageHeaderComponent, StatusBadgeComponent, CurrencyBrlPipe,
+    PageHeaderComponent, StatusBadgeComponent, CurrencyBrlPipe, IconComponent, KpiCardComponent
   ],
   providers: [MessageService],
   templateUrl: './pedidos-list.component.html',
@@ -54,22 +56,69 @@ export class PedidosListComponent implements OnInit {
   }
 
   // KPIs
-  get totalPedidos(): number { return this.pedidos.length; }
-  get pedidosPendentes(): number { return this.pedidos.filter(p => p.status === StatusPedido.RASCUNHO || p.status === StatusPedido.APROVADO).length; }
+  get totalPedidosAtivos(): number {
+    return this.pedidos.filter(p => p.status.toLowerCase() !== 'cancelado').length;
+  }
+  get pedidosRascunhos(): number { return this.pedidos.filter(p => p.status === StatusPedido.RASCUNHO).length; }
+  get pedidosAprovados(): number { return this.pedidos.filter(p => p.status === StatusPedido.APROVADO).length; }
   get pedidosEmProducao(): number { return this.pedidos.filter(p => p.status === StatusPedido.EM_PRODUCAO).length; }
   get pedidosEntregues(): number { return this.pedidos.filter(p => p.status === StatusPedido.ENTREGUE).length; }
-  get valorTotal(): number { return this.pedidos.reduce((acc, p) => acc + parseFloat(p.valor_total), 0); }
+  
+  // 📦 FUNÇÃO : Conta a quantidade (ignorando cancelados) de acordo com o status
+  contarPedidos(status?: string): number {
+    return this.pedidos
+      .filter(p => {
+        const s = p.status.toLowerCase();
+        // Mantemos a MESMA regra de negócio: cancelado não conta no "Geral"
+        if (s === 'cancelado') return false;
+        if (!status || status === 'todos') return true;
+        return s === status.toLowerCase();
+      }).length; // Aqui apenas pegamos o tamanho da lista filtrada
+  }
 
-  chipClass(status: StatusPedido): string {
-    if (this.statusFiltro !== status) return 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300';
-    const map: Record<StatusPedido, string> = {
-      [StatusPedido.RASCUNHO]:    'bg-zinc-600 text-white border-zinc-600',
-      [StatusPedido.APROVADO]:    'bg-amber-500 text-white border-amber-500',
-      [StatusPedido.EM_PRODUCAO]: 'bg-violet-500 text-white border-violet-500',
-      [StatusPedido.ENTREGUE]:    'bg-emerald-500 text-white border-emerald-500',
-      [StatusPedido.CANCELADO]:   'bg-rose-500 text-white border-rose-500',
-    };
-    return map[status];
+  // 💰 FUNÇÃO 2: Soma o faturamento (ignorando cancelados) de acordo com o status
+  calcularValorTotal(status?: string): number {
+  return this.pedidos
+    .filter(p => {
+      const s = p.status.toLowerCase();
+      // 1. Se o pedido for cancelado, ele NUNCA entra na conta (regra de ouro)
+      if (s === 'cancelado') return false;
+      
+      // 2. Se não passou status (ou for 'todos'), agora ele passa (desde que não seja cancelado)
+      if (!status || status === 'todos') return true;
+      
+      // 3. Se passou um status específico (ex: 'entregue'), filtra por ele
+      return s === status.toLowerCase();
+    })
+    .reduce((acc, p) => acc + (Number(p.valor_total) || 0), 0);
+}
+
+  chipClass(status: string): string {
+  const s = status.toLowerCase();
+  const isActive = this.statusFiltro?.toLowerCase() === s;
+  
+  // 🎨 ESTADO ATIVO: Quando o usuário clica no filtro
+  if (isActive) {
+    switch (s) {
+      case 'entregue': 
+        return 'bg-emerald-500 text-white border-emerald-600 shadow-sm';
+      case 'em_producao': 
+        return 'bg-violet-500 text-white border-violet-600 shadow-sm'; // 🚀 Adicionado aqui!
+      case 'rascunho': 
+        return 'bg-zinc-500 text-white border-zinc-600 shadow-sm';
+      case 'aprovado': 
+        return 'bg-sky-500 text-white border-sky-600 shadow-sm';
+      case 'cancelado': 
+        return 'bg-rose-500 text-white border-rose-600 shadow-sm';
+      case 'pendente':
+        return 'bg-amber-500 text-white border-amber-600 shadow-sm';
+      default: 
+        return 'bg-zinc-800 text-white border-zinc-900';
+    }
+  }
+
+    // ⚪ ESTADO INATIVO: Cor padrão quando não está filtrando por ele
+    return 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300';
   }
 
   novo(): void { this.router.navigate(['/pedidos/novo']); }
