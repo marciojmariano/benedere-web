@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -13,11 +13,14 @@ import { Cliente, Nutricionista, StatusPedido } from '../../core/models';
 import { KpiCardComponent } from '../../shared/components/kpi-card.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge.component';
 import { AvatarComponent } from '../../shared/components/avatar.component';
+import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
+import { IconComponent } from '../../shared/components/icon.component';
+
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, KpiCardComponent, StatusBadgeComponent, AvatarComponent],
+  imports: [CommonModule, KpiCardComponent, StatusBadgeComponent, AvatarComponent, CurrencyBrlPipe, IconComponent],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
@@ -28,6 +31,13 @@ export class DashboardComponent implements OnInit {
   private pedidoService = inject(PedidoService);
   private nutricionistaService = inject(NutricionistaService);
   private router = inject(Router);
+
+  totalVendas = computed(() => this.pedidoService.contarPedidos('Entregue'));
+  totalFaturamento = computed(() => this.pedidoService.calcularValorTotal('Entregue'));
+  ticketMedio = computed(() => {
+    const totalVendas = this.totalVendas();
+    return totalVendas > 0 ? this.totalFaturamento() / totalVendas : 0;
+  });
 
   loading = true;
   nomeUsuario = 'Admin';
@@ -84,3 +94,4 @@ export class DashboardComponent implements OnInit {
     this.router.navigate([path]);
   }
 }
+

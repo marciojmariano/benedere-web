@@ -17,29 +17,38 @@
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <app-kpi-card
-        icon="pi pi-users"
+        icon="users"
         [value]="totalClientes"
         label="Clientes Ativos"
-        color="emerald"
-      />
+        color="emerald">
+        <app-icon name="users" [size]="20" class="text-emerald-600"></app-icon>
+      </app-kpi-card>
+        
       <app-kpi-card
-        icon="pi pi-box"
-        [value]="totalIngredientes"
-        label="Ingredientes"
-        color="sky"
-      />
+        icon="cart"
+        [value]="totalVendas()"
+        label="Total de vendas"
+        color="emerald">
+        <app-icon name="cart" [size]="20" class="text-emerald-600"></app-icon>
+      </app-kpi-card>
+
       <app-kpi-card
-        icon="pi pi-tag"
-        [value]="totalProdutos"
-        label="Produtos"
-        color="violet"
-      />
+        icon="trendingUp"
+        [value]="totalFaturamento() | currencyBrl"
+        label="Faturamento"
+        color="emerald">
+        <app-icon name="trendingUp" [size]="20" class="text-emerald-600"></app-icon>
+      </app-kpi-card>
+      
       <app-kpi-card
-        icon="pi pi-shopping-cart"
-        [value]="totalPedidosPendentes"
-        label="Pedidos Pendentes"
-        color="amber"
-      />
+        icon="dollar"
+        [value]="ticketMedio() | currencyBrl"
+        label="Ticket médio"
+        color="emerald">
+        <app-icon name="dollar" [size]="20" class="text-emerald-600"></app-icon>
+      </app-kpi-card>
+
+      
     </div>
 
     <!-- Content Grid — 2 colunas (conforme DashRef1) -->
