@@ -13,7 +13,7 @@ export class EstoqueService extends ApiService {
     return this.post<MovimentacaoEstoque>('/estoque/entradas', dados);
   }
 
-  listarMovimentacoes(limit = 50, offset = 0): Observable<MovimentacaoEstoque[]> {
+  listarMovimentacoes(limit = 5000, offset = 0): Observable<MovimentacaoEstoque[]> {
     return this.get<MovimentacaoEstoque[]>('/estoque/movimentacoes', { limit, offset });
   }
 
@@ -21,7 +21,7 @@ export class EstoqueService extends ApiService {
     return this.get<MovimentacaoEstoque>(`/estoque/movimentacoes/${id}`);
   }
 
-  listarPorIngrediente(ingredienteId: string, limit = 50, offset = 0): Observable<MovimentacaoEstoque[]> {
+  listarPorIngrediente(ingredienteId: string, limit = 5000, offset = 0): Observable<MovimentacaoEstoque[]> {
     return this.get<MovimentacaoEstoque[]>(
       `/estoque/ingredientes/${ingredienteId}/movimentacoes`,
       { limit, offset },
