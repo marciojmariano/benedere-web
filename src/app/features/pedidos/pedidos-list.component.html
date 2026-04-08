@@ -100,6 +100,7 @@
           <th pSortableColumn="valor_total" class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">Valor Total <p-sortIcon field="valor_total" /></th>
           <th class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">Itens</th>
           <th pSortableColumn="created_at" class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">Data <p-sortIcon field="created_at" /></th>
+          <th pSortableColumn="data_entrega_prevista" class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">Entrega <p-sortIcon field="data_entrega_prevista" /></th>
           <th class="text-center px-5 py-3.5 text-xs font-bold text-zinc-400 uppercase tracking-wider"></th>
         </tr>
       </ng-template>
@@ -114,6 +115,13 @@
           <td class="text-sm font-bold text-emerald-700 text-center">{{ p.valor_total | currencyBrl }}</td>
           <td class="py-2 px-5 text-zinc-600 text-center">{{ p.total_itens }}</td>
           <td class="text-center text-sm text-zinc-500">{{ formatDate(p.created_at) }}</td>
+          <td class="text-center text-sm text-zinc-500">
+            @if (p.data_entrega_prevista) {
+              {{ formatDate(p.data_entrega_prevista) }}
+            } @else {
+              <span class="text-zinc-300">—</span>
+            }
+          </td>
           <td class="text-center py-2 px-5 text-right">
             <button
               class="p-2 rounded-lg text-zinc-300 group-hover:text-emerald-600 group-hover:bg-emerald-50 transition-all"
@@ -127,7 +135,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="text-center py-20 bg-zinc-50/20">
+          <td colspan="8" class="text-center py-20 bg-zinc-50/20">
             <div class="flex flex-col items-center">
               <app-icon name="shoppingBag" [size]="48" class="text-zinc-200 mb-4"></app-icon>
               <p class="text-zinc-500 font-semibold">Nenhum pedido encontrado</p>

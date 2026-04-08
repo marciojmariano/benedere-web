@@ -91,6 +91,20 @@
               ></textarea>
             </div>
 
+            <!-- Data de Entrega Prevista -->
+            <div>
+              <label class="block text-sm font-semibold text-zinc-700 mb-1.5">Data de Entrega Prevista</label>
+              <p-datepicker
+                formControlName="data_entrega_prevista"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                [minDate]="minDate"
+                placeholder="Selecione a data..."
+                styleClass="w-full"
+              />
+              <p class="text-xs text-zinc-400 mt-1">Opcional — define a data esperada de entrega ao cliente</p>
+            </div>
+
           </div>
 
           <!-- Aviso rascunho -->

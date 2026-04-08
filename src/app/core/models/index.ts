@@ -314,6 +314,7 @@ export interface PedidoResumo {
   status: StatusPedido;
   valor_total: string;
   total_itens: number;
+  data_entrega_prevista: string | null;
   created_at: string;
 }
 

@@ -57,7 +57,7 @@ export class PedidoService extends ApiService {
     return this.get<Pedido>(`/pedidos/${id}`);
   }
 
-  criar(dados: { cliente_id: string; markup_id?: string; observacoes?: string }): Observable<Pedido> {
+  criar(dados: { cliente_id: string; markup_id?: string; observacoes?: string; data_entrega_prevista?: string }): Observable<Pedido> {
     return this.post<Pedido>('/pedidos/', dados);
   }
 

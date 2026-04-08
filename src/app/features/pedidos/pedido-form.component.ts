@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
+import { DatePickerModule } from 'primeng/datepicker';
 import { MessageService } from 'primeng/api';
 import { forkJoin } from 'rxjs';
 
@@ -21,7 +22,7 @@ import { AvatarComponent } from '../../shared/components/avatar.component';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, ButtonModule, SelectModule,
-    TextareaModule, ToastModule, PageHeaderComponent, AvatarComponent,
+    TextareaModule, ToastModule, DatePickerModule, PageHeaderComponent, AvatarComponent,
   ],
   providers: [MessageService],
   templateUrl: './pedido-form.component.html',
@@ -39,6 +40,7 @@ export class PedidoFormComponent implements OnInit {
   markups: Markup[] = [];
   salvando = false;
   carregando = true;
+  minDate = new Date();
 
   clienteSelecionado = computed(() => {
     const id = this.form?.get('cliente_id')?.value;
@@ -55,6 +57,7 @@ export class PedidoFormComponent implements OnInit {
       cliente_id: [null, Validators.required],
       markup_id: [null],
       observacoes: [''],
+      data_entrega_prevista: [null],
     });
 
     forkJoin({
@@ -81,7 +84,12 @@ export class PedidoFormComponent implements OnInit {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.salvando = true;
 
-    this.pedidoService.criar(this.form.value).subscribe({
+    const formValue = { ...this.form.value };
+    if (formValue.data_entrega_prevista instanceof Date) {
+      formValue.data_entrega_prevista = formValue.data_entrega_prevista.toISOString();
+    }
+
+    this.pedidoService.criar(formValue).subscribe({
       next: (pedido) => {
         this.messageService.add({ severity: 'success', summary: 'Pedido criado!', detail: `Pedido ${pedido.numero} criado como rascunho` });
         setTimeout(() => this.router.navigate(['/pedidos', pedido.id]), 1000);

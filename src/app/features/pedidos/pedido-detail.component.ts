@@ -11,6 +11,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TextareaModule } from 'primeng/textarea';
+import { DatePickerModule } from 'primeng/datepicker';
 
 import { PedidoService } from '../../core/services/pedido.service';
 import { ProdutoService } from '../../core/services/produto.service';
@@ -40,7 +41,7 @@ interface ComposicaoTemp {
   imports: [
     CommonModule, FormsModule, ButtonModule, ToastModule,
     DialogModule, SelectModule, InputTextModule, InputNumberModule,
-    ConfirmDialogModule, TextareaModule,
+    ConfirmDialogModule, TextareaModule, DatePickerModule,
     PageHeaderComponent, StatusTimelineComponent, StatusBadgeComponent, AvatarComponent, CurrencyBrlPipe,
   ],
   providers: [MessageService, ConfirmationService],
@@ -77,6 +78,11 @@ export class PedidoDetailComponent implements OnInit {
   persQuantidade = 1;
   persTipoRefeicao: TipoRefeicao | null = null;
   persComposicao: ComposicaoTemp[] = [];
+
+  // Edição de data de entrega
+  editandoDataEntrega = false;
+  dataEntregaTemp: Date | null = null;
+  minDate = new Date();
 
   // Cancelamento
   showCancelDialog = false;
@@ -282,6 +288,32 @@ export class PedidoDetailComponent implements OnInit {
         });
       },
     });
+  }
+
+  // ── Edição data de entrega ───────────────────────────────────────────────
+
+  iniciarEdicaoDataEntrega(): void {
+    this.dataEntregaTemp = this.pedido?.data_entrega_prevista
+      ? new Date(this.pedido.data_entrega_prevista)
+      : null;
+    this.editandoDataEntrega = true;
+  }
+
+  salvarDataEntrega(): void {
+    if (!this.pedido) return;
+    const dataISO = this.dataEntregaTemp ? this.dataEntregaTemp.toISOString() : undefined;
+    this.service.atualizar(this.pedido.id, { data_entrega_prevista: dataISO! }).subscribe({
+      next: () => {
+        this.carregarPedido(this.pedido!.id);
+        this.editandoDataEntrega = false;
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Data de entrega atualizada' });
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao atualizar data de entrega' }),
+    });
+  }
+
+  cancelarEdicaoDataEntrega(): void {
+    this.editandoDataEntrega = false;
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────
