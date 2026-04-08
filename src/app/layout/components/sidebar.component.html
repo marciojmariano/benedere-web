@@ -1,25 +1,25 @@
 <aside
   class="flex flex-col h-screen shadow-lg bg-zinc-900 sidebar-transition"
-  [class.w-64]="!collapsed()"
+  [class.w-60]="!collapsed()"
   [class.w-16]="collapsed()"
 >
 
   <!-- Logo -->
-  <div class="flex items-center gap-3 px-4 py-5 border-b border-zinc-700"
-       [class.justify-center]="collapsed()">
-    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-emerald-500 shrink-0">
-      <span class="text-white font-bold text-sm">B</span>
-    </div>
-    @if (!collapsed()) {
-      <div>
-        <h1 class="text-white font-bold text-lg leading-none">Benedere</h1>
-        <p class="text-zinc-400 text-xs">Alimentação Saudável</p>
+    <div class="flex items-center gap-3 px-4 py-4 border-b border-zinc-800">
+      <div class="flex-none flex items-center justify-center bg-emerald-500 rounded-lg"
+          style="width: 32px; height: 32px; min-width: 32px; min-height: 32px;">
+        <app-icon name="leaf" [size]="16" class="text-white"></app-icon>
       </div>
-    }
-  </div>
+
+      @if (sidebarOpen()) {
+    <div class="leading-none"> <p class="text-white font-bold text-sm m-0 leading-[1.1]">Benedere</p>
+      <p class="text-zinc-500 text-xs m-0 leading-[1.1]">Alimentação Saudável</p>
+    </div>
+}
+    </div>
 
   <!-- Menu -->
-  <nav class="flex-1 px-2 py-4 overflow-y-auto">
+  <nav class="flex-1 px-2 py-2 overflow-y-auto custom-scrollbar">
     @for (group of menuGroups; track group.label) {
       @if (group.label && !collapsed()) {
         <p class="px-3 pt-3 pb-1 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
@@ -34,7 +34,7 @@
           [routerLink]="item.route"
           routerLinkActive="active-link"
           [routerLinkActiveOptions]="item.route === '/' ? { exact: true } : { exact: false }"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition-all duration-200 cursor-pointer"
+          class="flex items-center gap-3 px-3 py-1 rounded-lg mb-1 text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition-all duration-200 cursor-pointer"
           [class.justify-center]="collapsed()"
           [attr.title]="collapsed() ? item.label : null"
         >

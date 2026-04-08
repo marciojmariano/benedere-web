@@ -1,5 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { IconComponent } from '../../shared/components/icon.component';
+
 
 interface MenuItem {
   label: string;
@@ -15,7 +17,7 @@ interface MenuGroup {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, IconComponent],
   templateUrl: './sidebar.component.html',
   styles: [`
     :host {
@@ -36,7 +38,7 @@ interface MenuGroup {
 export class SidebarComponent {
   collapsed = input(false);
   collapsedChange = output<boolean>();
-
+  sidebarOpen = signal(true);
   menuGroups: MenuGroup[] = [
     {
       label: '',

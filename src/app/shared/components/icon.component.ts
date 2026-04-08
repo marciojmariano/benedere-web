@@ -1,5 +1,4 @@
-// src/app/shared/components/icon.component.ts
-import { Component, Input, SecurityContext, inject } from '@angular/core';
+import { Component, Input, computed, inject, signal } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SVG_ICONS } from '../constants/icons.constant';
 
@@ -17,19 +16,20 @@ import { SVG_ICONS } from '../constants/icons.constant';
       stroke-linecap="round" 
       stroke-linejoin="round" 
       [class]="className"
-      [innerHTML]="safeSvg">
-    </svg>
+      [innerHTML]="safeSvg()"> </svg>
   `
 })
 export class IconComponent {
   private sanitizer = inject(DomSanitizer);
 
-  @Input() name: string = '';
+  // Transformando Inputs em Signals para performance de elite
+  @Input({ required: true }) name: string = '';
   @Input() size: number = 18;
   @Input() className: string = '';
 
-  get safeSvg() {
+  // O computed só recalcula se o 'name' mudar
+  safeSvg = computed(() => {
     const iconPath = SVG_ICONS[this.name] || '';
     return this.sanitizer.bypassSecurityTrustHtml(iconPath);
-  }
+  });
 }

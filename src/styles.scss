@@ -134,3 +134,27 @@ body {
     }
   }
 }
+
+/* Custom Scrollbar para a Sidebar e áreas Dark */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px; /* Bem fininha */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Fundo transparente para não marcar o layout */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3f3f46; /* Zinc-700: uma cor discreta */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #059669; /* Emerald-600: brilha com a cor da sua marca no hover */
+}
+
+/* Para Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
