@@ -107,10 +107,10 @@
       <ng-template pTemplate="body" let-p>
         <tr class="group cursor-pointer hover:bg-zinc-50/30 transition-colors" (click)="ver(p)">
           <td class="text-center text-xs font-mono font-bold text-indigo-600">#{{ p.numero }}</td>
+          <td class="py-2 px-5 text-zinc-700 text-center">{{ p.cliente_nome }}</td>
           <td class="py-2 px-5 text-center">
             <app-status-badge [status]="p.status"></app-status-badge>
           </td>
-          <td class="py-2 px-5 text-zinc-700 text-center">{{ p.cliente_nome }}</td>
           <td class="text-sm font-bold text-emerald-700 text-center">{{ p.valor_total | currencyBrl }}</td>
           <td class="py-2 px-5 text-zinc-600 text-center">{{ p.total_itens }}</td>
           <td class="text-center text-sm text-zinc-500">{{ formatDate(p.created_at) }}</td>
