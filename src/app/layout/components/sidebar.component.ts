@@ -43,43 +43,43 @@ export class SidebarComponent {
     {
       label: '',
       items: [
-        { label: 'Dashboard', icon: 'pi pi-home', route: '/' },
+        { label: 'Dashboard', icon: 'home', route: '/' },
       ],
     },
     {
       label: 'Cadastros',
       items: [
-        { label: 'Clientes', icon: 'pi pi-users', route: '/clientes' },
-        { label: 'Nutricionistas', icon: 'pi pi-heart', route: '/nutricionistas' },
+        { label: 'Clientes', icon: 'users', route: '/clientes' },
+        { label: 'Nutricionistas', icon: 'heart', route: '/nutricionistas' },
       ],
     },
     {
       label: 'Produtos',
       items: [
-        { label: 'Produtos', icon: 'pi pi-tag', route: '/produtos' },
-        { label: 'Ingredientes', icon: 'pi pi-box', route: '/ingredientes' },
-        { label: 'Estoque', icon: 'pi pi-warehouse', route: '/estoque' },
+        { label: 'Produtos', icon: 'tag', route: '/produtos' },
+        { label: 'Ingredientes', icon: 'leaf', route: '/ingredientes' },
+        { label: 'Estoque', icon: 'box', route: '/estoque' },
       ],
     },
     {
       label: 'Precificação',
       items: [
-        { label: 'Índices de Markup', icon: 'pi pi-list', route: '/indices-markup' },
-        { label: 'Markups', icon: 'pi pi-percentage', route: '/markups' },
-        { label: 'Embalagens', icon: 'pi pi-inbox', route: '/embalagens' },
+        { label: 'Índices de Markup', icon: 'list', route: '/indices-markup' },
+        { label: 'Markups', icon: 'percentage', route: '/markups' },
+        { label: 'Embalagens', icon: 'inbox', route: '/embalagens' },
       ],
     },
     {
       label: 'Pedidos',
       items: [
-        { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/pedidos' },
+        { label: 'Pedidos', icon: 'shopping-cart', route: '/pedidos' },
       ],
     },
     {
       label: 'Produção',
       items: [
-        { label: 'Ordem de Produção', icon: 'pi pi-clipboard', route: '/producao' },
-        { label: 'Montagem', icon: 'pi pi-list-check', route: '/producao/mapa-montagem' },
+        { label: 'Ordem de Produção', icon: 'clipboard', route: '/producao' },
+        { label: 'Montagem', icon: 'list-check', route: '/producao/mapa-montagem' },
       ],
     },
   ];
