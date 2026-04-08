@@ -53,6 +53,7 @@ provideAuth0({
   clientId: environment.auth0.clientId,
   authorizationParams: environment.auth0.authorizationParams,
   useRefreshTokens: false,
+  cacheLocation: 'localstorage',
   httpInterceptor: {
     allowedList: [
       {
@@ -64,6 +65,7 @@ provideAuth0({
         },
       },
     ],
+    
   },
 }),
 ],
