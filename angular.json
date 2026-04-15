@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "benedere-web": {
+    "frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -66,10 +66,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "benedere-web:build:production"
+              "buildTarget": "frontend:build:production"
             },
             "development": {
-              "buildTarget": "benedere-web:build:development"
+              "buildTarget": "frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
